@@ -175,8 +175,10 @@ async function initApp() {
     questionBankAll = [];
   }
 
-  // If they came with #admin in the URL, load admin view ONLY AFTER fetching the db
-  if (currentUser && location.hash === '#admin') {
+  // If they came with #admin in the URL, OR just returned from OAuth redirect (access_token in hash)
+  const isOAuthCallback = location.hash.includes('access_token') || location.hash.includes('type=recovery');
+  if (currentUser && (location.hash === '#admin' || isOAuthCallback)) {
+    location.hash = '#admin';
     await loadAdminDashboard();
   }
 }
@@ -306,9 +308,7 @@ async function finishQuiz() {
   } catch (e) { console.error(e); }
 
   const scoreEl = document.getElementById('result-score-number');
-  if (scoreEl) {
-    scoreEl.textContent = `${score} / ${questionBank.length}`;
-  }
+  if (scoreEl) scoreEl.textContent = `${score} / ${questionBank.length}`;
 
   showView(views.result);
 }
@@ -321,6 +321,12 @@ navBtns.admin?.addEventListener('click', async (e) => {
   if (!currentUser) {
     alert("Iniciando Login Seguro do Google para Professores/Coordenadores...\nAguarde!");
     await signInWithGoogle();
+    // Se o login foi via popup (não redirect), o código continua aqui
+    currentUser = await getUser();
+    if (currentUser) {
+      location.hash = '#admin';
+      await loadAdminDashboard();
+    }
   } else {
     location.hash = '#admin';
     await loadAdminDashboard();
