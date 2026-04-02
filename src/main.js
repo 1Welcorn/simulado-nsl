@@ -38,7 +38,8 @@ const SKILLS_CONTENT = {
     "Everyday Conversations and Real-World Dialogues",
     "Grammar in Context: Form, Meaning and Use",
     "Vocabulary Development through Global Themes",
-    "Health, Well-Being, and Mindful Communication"
+    "Health, Well-Being, and Mindful Communication",
+    "Applied Grammar"
   ],
   "Nível 1": [
     "Understanding and Creating Meaning through Texts",
@@ -578,7 +579,7 @@ document.getElementById('admin-bulk-btn')?.addEventListener('click', async () =>
       let qDifficulty = rawQ.difficulty || rawQ.dificuldade || 'Média';
       let qTheme = rawQ.theme || rawQ.tema || 'Temas Globais';
       let qSource = rawQ.source || rawQ.fonte || rawQ.banca || rawQ.vestibular || rawQ.ano || null;
-      let qSkills = rawQ.skills || rawQ.skill || rawQ.habilidade || rawQ.conteudo || rawQ.conteudos || null;
+      let qSkills = rawQ.skills || rawQ.skill || rawQ.habilidade || rawQ.habilidade_especifica || rawQ.conteudo || rawQ.conteudos || rawQ.assunto || null;
 
       let qOptions = rawQ.options;
       if (!qOptions && rawQ.alternativas) {
@@ -745,7 +746,8 @@ window.refreshQuestionBankList = () => {
     d.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:start; cursor:pointer;" onclick="const e = document.getElementById('q-det-${q.id}'); if(e) e.classList.toggle('hidden');">
         <div style="flex:1;">
-          <strong title="ID permanente da questão no Banco de Dados. A questão receberá um novo número (Ex: 1, 2, 3...) de forma ordenada quando o simulado for gerado para o aluno." style="cursor:help; border-bottom: 1px dotted var(--color-text-muted); padding-bottom: 0.1rem; margin-right: 0.5rem; font-size: 0.9rem;">ID Banco: ${q.id || i + 1}</strong> 
+          <strong title="Número organizado sequencialmente" style="cursor:help; padding-bottom: 0.1rem; margin-right: 0.5rem; font-size: 1rem; color: var(--color-primary);">Questão ${String(questionBankAll.findIndex(x => x.id === q.id) + 1).padStart(2, '0')}</strong> 
+          <span title="ID real no banco de dados" style="font-size: 0.7rem; color: var(--color-text-muted); margin-right: 0.5rem;">(ID BD: ${q.id})</span>
           <span style="font-size: 0.75rem; background: var(--color-bg); padding: 0.1rem 0.4rem; border-radius: 4px; border: 1px solid var(--color-border);">${q.level || 'Nível Livre'}</span>
           <span style="font-size: 0.75rem; background: ${badgeColor}; color: white; padding: 0.1rem 0.4rem; border-radius: 4px; border: 1px solid transparent; margin-left: 0.25rem;">${q.difficulty || 'Média'}</span>
           <span style="font-size: 0.70rem; background: #f1f5f9; color: #334155; padding: 0.1rem 0.4rem; border-radius: 4px; border: 1px dashed #cbd5e1; margin-left: 0.25rem;">📌 ${q.theme || 'Temas Globais'}</span>
