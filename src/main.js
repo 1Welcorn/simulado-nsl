@@ -130,7 +130,17 @@ async function initApp() {
   }
 
   // Configuração dos eventos de Filtro
-  document.querySelectorAll('.q-filter').forEach(cb => cb.addEventListener('change', window.refreshQuestionBankList));
+  document.querySelectorAll('.q-filter').forEach(cb => {
+    cb.addEventListener('change', (e) => {
+      // Quando desmarcar o "Somente no Simulado", limpa automaticamente todos os filtros para mostrar tudo
+      if (e.target.getAttribute('data-type') === 'active' && !e.target.checked) {
+        document.querySelectorAll('.q-filter').forEach(c => c.checked = false);
+        if (document.getElementById('q-filter-source')) document.getElementById('q-filter-source').value = '';
+        if (document.getElementById('q-filter-content')) document.getElementById('q-filter-content').value = '';
+      }
+      window.refreshQuestionBankList();
+    });
+  });
   document.getElementById('q-filter-source')?.addEventListener('input', window.refreshQuestionBankList);
   document.getElementById('q-filter-content')?.addEventListener('input', window.refreshQuestionBankList);
   document.getElementById('q-filter-clear-btn')?.addEventListener('click', () => {
