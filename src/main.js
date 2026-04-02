@@ -706,6 +706,9 @@ window.refreshQuestionBankList = () => {
   if (!qList) return;
   qList.innerHTML = '';
 
+  const totalCountEl = document.getElementById('bank-total-count');
+  if (totalCountEl) totalCountEl.textContent = `(${questionBankAll.length} questões)`;
+
   const filterLevel = Array.from(document.querySelectorAll('.q-filter[data-type="level"]:checked')).map(el => el.value);
   const filterDiff = Array.from(document.querySelectorAll('.q-filter[data-type="difficulty"]:checked')).map(el => el.value);
   const filterTheme = Array.from(document.querySelectorAll('.q-filter[data-type="theme"]:checked')).map(el => el.value);
