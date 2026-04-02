@@ -202,8 +202,8 @@ document.getElementById('student-form')?.addEventListener('submit', async (e) =>
   // Register in database immediately as starting
   await addStudentRecord({ name, grade, score: 0, cpf });
 
-  const summaryEl = document.getElementById('quiz-student-summary');
-  if (summaryEl) summaryEl.textContent = `Aluno(a) ${name} liberado para iniciar o simulado.`;
+  const summaryEl = document.getElementById('quiz-student-name');
+  if (summaryEl) summaryEl.textContent = name;
 
   if (questionBank.length === 0) {
     alert(`O banco de dados ainda não tem questões ativas cadastradas para esta categoria. Peça ao administrador para incluir questões!`);
@@ -223,14 +223,14 @@ document.getElementById('start-registration-btn')?.addEventListener('click', () 
 // -----------------------------------------
 function renderQuestion() {
   const q = questionBank[currentQIdx];
-  const counterEl = document.getElementById('question-counter-pill');
+  const counterEl = document.getElementById('quiz-counter');
   if (counterEl) counterEl.textContent = `Questão ${currentQIdx + 1} de ${questionBank.length}`;
 
   const progPercent = (currentQIdx / questionBank.length) * 100;
-  const progFill = document.getElementById('progress-fill');
+  const progFill = document.getElementById('quiz-progress');
   if (progFill) progFill.style.width = `${progPercent}%`;
 
-  const titleEl = document.getElementById('question-title');
+  const titleEl = document.getElementById('q-title');
   if (titleEl) {
     if (q.source) {
       titleEl.innerHTML = `<span style="font-size: 0.85rem; font-weight: 500; color: var(--color-primary); display:block; margin-bottom: 0.8rem; background: #e0e7ff; padding: 0.2rem 0.6rem; border-radius: 4px; border: 1px dashed #a5b4fc; width: fit-content;">🏛️ Fonte: ${q.source}</span>${q.text}`;
@@ -255,7 +255,7 @@ function renderQuestion() {
     hide(imgEl);
   }
 
-  const optContainer = document.getElementById('option-list');
+  const optContainer = document.getElementById('q-options');
   if (optContainer) {
     optContainer.innerHTML = '';
     q.options.forEach((opt, idx) => {
@@ -279,7 +279,7 @@ function renderQuestion() {
   }
 }
 
-document.getElementById('next-question-btn')?.addEventListener('click', () => {
+document.getElementById('quiz-next-btn')?.addEventListener('click', () => {
   const selected = document.querySelector('input[name="q-ans"]:checked');
   if (!selected) return alert('Escolha uma opção antes de avançar.');
 
@@ -297,7 +297,7 @@ document.getElementById('next-question-btn')?.addEventListener('click', () => {
 });
 
 async function finishQuiz() {
-  const progFill = document.getElementById('progress-fill');
+  const progFill = document.getElementById('quiz-progress');
   if (progFill) progFill.style.width = `100%`;
 
   // Update final score in Supabase
@@ -305,20 +305,10 @@ async function finishQuiz() {
     await supabase.from('students').upsert({ name: student.name, grade: student.grade, score: score, cpf: student.cpf });
   } catch (e) { console.error(e); }
 
-  const scoreEl = document.getElementById('final-score');
+  const scoreEl = document.getElementById('result-score-number');
   if (scoreEl) {
-    const percentage = Math.round((score / questionBank.length) * 100) || 0;
-    scoreEl.textContent = `${percentage}%`;
+    scoreEl.textContent = `${score} / ${questionBank.length}`;
   }
-
-  const resultName = document.getElementById('result-student-name');
-  if (resultName) resultName.textContent = student.name;
-
-  const correctCount = document.getElementById('correct-count');
-  if (correctCount) correctCount.textContent = `${score} / ${questionBank.length}`;
-
-  const resGrade = document.getElementById('result-grade');
-  if (resGrade) resGrade.textContent = student.grade;
 
   showView(views.result);
 }
@@ -407,15 +397,15 @@ navBtns.home?.addEventListener('click', () => {
 });
 
 // Admin Filter Logic
-document.getElementById('admin-grade-filter')?.addEventListener('change', refreshAdminTable);
+document.getElementById('admin-filter-grade')?.addEventListener('change', refreshAdminTable);
 
 async function refreshAdminTable() {
-  const tbody = document.getElementById('admin-results-body');
+  const tbody = document.getElementById('admin-table-body');
   if (!tbody) return;
   tbody.innerHTML = '<tr><td colspan="5">Carregando dados da nuvem...</td></tr>';
 
   let data = await fetchRankings();
-  const filter = document.getElementById('admin-grade-filter')?.value || 'all';
+  const filter = document.getElementById('admin-filter-grade')?.value || 'all';
 
   if (data) {
     if (filter !== 'all') {
