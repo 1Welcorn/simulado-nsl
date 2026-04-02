@@ -1,4 +1,18 @@
+# Dependencies
+/node_modules
+
+# Vite
+/dist
 .env
-node_modules/
-dist/
-build/
+.env.*
+!.env.example
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor directories and files
+.vscode
+.idea
