@@ -11,10 +11,13 @@ export const signInWithGoogle = async () => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: window.location.origin
+      redirectTo: window.location.origin + '/#admin'
     }
   });
-  if (error) console.error('Erro no login do Google:', error.message);
+  if (error) {
+    console.error('Erro no login do Google:', error.message);
+    alert('Erro ao tentar fazer login: ' + error.message + '\n\n(Verifique se ativou o provedor Google e adicionou sua URL do Netlify nas Redirect URLs do Supabase!)');
+  }
   return data;
 };
 
