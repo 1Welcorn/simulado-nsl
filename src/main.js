@@ -665,6 +665,32 @@ document.getElementById('admin-nuke-btn')?.addEventListener('click', async () =>
   }
 });
 
+window.filterFromSummary = (level, difficulty) => {
+  // Limpar todos os filtros primeiro
+  document.querySelectorAll('.q-filter').forEach(cb => cb.checked = false);
+  if (document.getElementById('q-filter-source')) document.getElementById('q-filter-source').value = '';
+  if (document.getElementById('q-filter-content')) document.getElementById('q-filter-content').value = '';
+
+  // Ativar filtro "Somente no Simulado"
+  const activeCb = document.querySelector('.q-filter[data-type="active"]');
+  if (activeCb) activeCb.checked = true;
+
+  // Ativar filtro de Nível
+  const levelCb = document.querySelector(`.q-filter[data-type="level"][value="${level}"]`);
+  if (levelCb) levelCb.checked = true;
+
+  // Ativar filtro de Dificuldade (se clicado)
+  if (difficulty) {
+    const diffCb = document.querySelector(`.q-filter[data-type="difficulty"][value="${difficulty}"]`);
+    if (diffCb) diffCb.checked = true;
+  }
+
+  window.refreshQuestionBankList();
+  setTimeout(() => {
+    document.getElementById('admin-q-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+};
+
 window.refreshQuestionBankList = () => {
   const qList = document.getElementById('admin-q-list');
   if (!qList) return;
@@ -674,11 +700,13 @@ window.refreshQuestionBankList = () => {
   const filterDiff = Array.from(document.querySelectorAll('.q-filter[data-type="difficulty"]:checked')).map(el => el.value);
   const filterTheme = Array.from(document.querySelectorAll('.q-filter[data-type="theme"]:checked')).map(el => el.value);
   const filterRecent = document.querySelector('.q-filter[data-type="recent"]')?.checked;
+  const filterActive = document.querySelector('.q-filter[data-type="active"]')?.checked;
   const filterSource = document.getElementById('q-filter-source')?.value.toLowerCase().trim() || '';
   const filterContent = document.getElementById('q-filter-content')?.value.toLowerCase().trim() || '';
 
   const filteredBank = questionBankAll.filter(q => {
     if (filterRecent && !q._recentBatch) return false;
+    if (filterActive && !q.is_active) return false;
     if (filterLevel.length > 0 && !filterLevel.includes(q.level)) return false;
     if (filterDiff.length > 0 && !filterDiff.includes(q.difficulty)) return false;
     if (filterTheme.length > 0 && !filterTheme.includes(q.theme)) return false;
@@ -787,11 +815,11 @@ window.refreshQuestionBankList = () => {
   for (const [lvl, s] of Object.entries(stats)) {
     html += `
        <div style="background: white; padding: 0.6rem 1rem; border-radius: 6px; border: 1px solid #cbd5e1; flex: 1; min-width: 200px;">
-         <strong style="color:var(--color-primary); font-size: 1.1rem;">${lvl}</strong> <span style="font-size: 0.9rem; color: #64748b;">(${s.total} Questões)</span><br/>
+         <strong onclick="window.filterFromSummary('${lvl}')" style="color:var(--color-primary); font-size: 1.1rem; cursor:pointer; text-decoration:underline;" title="Ver todas as selecionadas deste nível">${lvl}</strong> <span style="font-size: 0.9rem; color: #64748b;">(${s.total} Questões)</span><br/>
          <div style="display:flex; gap:0.5rem; font-size:0.85rem; margin-top:0.4rem;">
-            ${s.F > 0 ? `<span style="background: #dcfce7; color: #166534; padding: 0.1rem 0.4rem; border-radius: 4px;">🎯 ${s.F} Fáceis</span>` : ''}
-            ${s.M > 0 ? `<span style="background: #fef3c7; color: #b45309; padding: 0.1rem 0.4rem; border-radius: 4px;">⚖️ ${s.M} Médias</span>` : ''}
-            ${s.D > 0 ? `<span style="background: #fee2e2; color: #991b1b; padding: 0.1rem 0.4rem; border-radius: 4px;">🌶️ ${s.D} Difíceis</span>` : ''}
+            ${s.F > 0 ? `<span onclick="window.filterFromSummary('${lvl}', 'Fácil')" style="background: #dcfce7; color: #166534; padding: 0.2rem 0.5rem; border-radius: 4px; cursor:pointer; display:inline-block;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1" title="Ver questões Fáceis selecionadas">🎯 ${s.F} Fáceis</span>` : ''}
+            ${s.M > 0 ? `<span onclick="window.filterFromSummary('${lvl}', 'Média')" style="background: #fef3c7; color: #b45309; padding: 0.2rem 0.5rem; border-radius: 4px; cursor:pointer; display:inline-block;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1" title="Ver questões Médias selecionadas">⚖️ ${s.M} Médias</span>` : ''}
+            ${s.D > 0 ? `<span onclick="window.filterFromSummary('${lvl}', 'Difícil')" style="background: #fee2e2; color: #991b1b; padding: 0.2rem 0.5rem; border-radius: 4px; cursor:pointer; display:inline-block;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1" title="Ver questões Difíceis selecionadas">🌶️ ${s.D} Difíceis</span>` : ''}
          </div>
        </div>
      `;

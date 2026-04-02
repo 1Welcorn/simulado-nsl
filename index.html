@@ -278,7 +278,8 @@
 
     /* View: Quiz */
     .quiz-card {
-      max-width: 800px;
+      max-width: 1000px;
+      width: 100%;
     }
 
     .progress-bar {
@@ -300,7 +301,7 @@
     .option-label {
       display: flex;
       align-items: center;
-      padding: 1rem 1.25rem;
+      padding: 1.25rem 1.5rem;
       border: 2px solid var(--color-border);
       border-radius: var(--radius-md);
       margin-bottom: 0.75rem;
@@ -308,6 +309,7 @@
       transition: var(--transition);
       background: white;
       font-weight: 500;
+      font-size: 1.15rem;
     }
 
     .option-label:hover {
@@ -504,7 +506,7 @@
         <span style="font-weight: 600; color: var(--color-text-muted);" id="quiz-student-name">Aluno</span>
       </div>
 
-      <h2 id="q-title" style="font-size: 1.4rem;">Carregando pergunta...</h2>
+      <h2 id="q-title" style="font-size: 1.7rem; line-height: 1.4;">Carregando pergunta...</h2>
       <div id="q-image-container" class="hidden"
         style="margin-top: 1.5rem; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--color-border); max-width: 100%; text-align: center; background: white;">
         <img id="q-image" src="" alt="Contexto da Pergunta"
@@ -750,6 +752,13 @@
                     <input type="checkbox" class="q-filter" data-type="recent" value="true"
                       style="margin-right: 0.3rem;">
                     ✨ Mostrar apenas Último Lote
+                  </label>
+                  <label
+                    style="background:#dcfce7; color:#166534; border: 1px solid #bbf7d0; border-radius:1rem; padding: 0.3rem 0.8rem; font-size: 0.8rem; font-weight: bold; cursor:pointer;"
+                    title="Mostra apenas as questões que estão selecionadas para a prova atual">
+                    <input type="checkbox" class="q-filter" data-type="active" value="true"
+                      style="margin-right: 0.3rem;">
+                    ✅ Somente no Simulado
                   </label>
                   <button id="q-filter-clear-btn" class="btn btn-secondary"
                     style="padding:0.2rem 0.6rem; font-size:0.75rem;">Limpar Filtros</button>
