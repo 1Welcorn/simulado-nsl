@@ -16,7 +16,7 @@ export const signInWithGoogle = async () => {
   });
   if (error) {
     console.error('Erro no login do Google:', error.message);
-    alert('Erro ao tentar fazer login: ' + error.message + '\n\n(Verifique se ativou o provedor Google e adicionou sua URL do Netlify nas Redirect URLs do Supabase!)');
+    alert('Erro ao tentar fazer login: ' + error.message + '\n\n(Verifique se ativou o provedor Google e adicionou sua URL da Vercel nas Redirect URLs do Supabase!)');
   }
   return data;
 };
