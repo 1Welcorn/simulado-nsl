@@ -729,73 +729,78 @@
           <div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
               <h3>Banco Atual</h3>
+              <button id="toggle-filters-btn" class="btn btn-secondary" type="button"
+                style="padding: 0.3rem 0.8rem; font-size: 0.8rem; border-radius: 6px;">Ocultar Filtros e Resumo</button>
             </div>
 
-            <div id="admin-q-summary" class="hidden"
-              style="background: #f8fafc; padding: 1rem; margin-bottom: 1.5rem; border-radius: var(--radius-md); border: 2px dashed #93c5fd;">
-              <!-- Injected by JS -->
-            </div>
-
-            <div id="admin-q-filters"
-              style="background:var(--color-surface); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--color-border); margin-bottom: 1.5rem;">
-              <div
-                style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
-                <h4 style="margin-bottom:0; font-size:0.95rem;">🔬 Filtros do Banco</h4>
-                <label
-                  style="background:#e0e7ff; color:#3730a3; border: 1px solid #a5b4fc; border-radius:1rem; padding: 0.3rem 0.8rem; font-size: 0.8rem; font-weight: bold; cursor:pointer;"
-                  title="Mostra apenas as questões adicionadas no último envio de JSON">
-                  <input type="checkbox" class="q-filter" data-type="recent" value="true" style="margin-right: 0.3rem;">
-                  ✨ Mostrar apenas Último Lote
-                </label>
-                <button id="q-filter-clear-btn" class="btn btn-secondary"
-                  style="padding:0.2rem 0.6rem; font-size:0.75rem;">Limpar Filtros</button>
+            <div id="admin-filters-summary-wrapper">
+              <div id="admin-q-summary" class="hidden"
+                style="background: #f8fafc; padding: 1rem; margin-bottom: 1.5rem; border-radius: var(--radius-md); border: 2px dashed #93c5fd;">
+                <!-- Injected by JS -->
               </div>
-              <div style="display:flex; flex-wrap:wrap; gap: 1rem; font-size:0.8rem;">
 
-                <div style="flex:1; min-width:140px;">
-                  <strong style="color:var(--color-primary);">📁 Nível</strong>
-                  <label style="display:block; margin-top:0.3rem; cursor:pointer;"><input type="checkbox"
-                      class="q-filter" data-type="level" value="Nível Júnior"> Júnior / Fundamental I</label>
-                  <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
-                      data-type="level" value="Nível 1"> Nível 1</label>
-                  <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
-                      data-type="level" value="Nível 2"> Nível 2</label>
-                  <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
-                      data-type="level" value="Nível 3"> Nível 3</label>
-                  <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
-                      data-type="level" value="Nível Livre"> Nível Livre</label>
-                </div>
-
-                <div style="flex:1; min-width:120px;">
-                  <strong style="color:var(--color-primary);">⚖️ Dificuldade</strong>
-                  <label style="display:block; margin-top:0.3rem; cursor:pointer;"><input type="checkbox"
-                      class="q-filter" data-type="difficulty" value="Fácil"> Fácil</label>
-                  <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
-                      data-type="difficulty" value="Média"> Média</label>
-                  <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
-                      data-type="difficulty" value="Difícil"> Difícil</label>
-                </div>
-
-                <div style="flex:1; min-width:180px;">
-                  <strong style="color:var(--color-primary);">📌 Tema Oficial</strong>
-                  <label style="display:block; margin-top:0.3rem; cursor:pointer;"><input type="checkbox"
-                      class="q-filter" data-type="theme" value="Temas Globais"> Temas Globais</label>
-                  <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
-                      data-type="theme" value="Tecnologia e Mídia"> Tecnologia e Mídia</label>
-                  <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
-                      data-type="theme" value="Linguagem em Contexto"> Linguagem Contexto</label>
-                  <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
-                      data-type="theme" value="Habilidades de Leitura/Audição"> Leitura/Audição</label>
-                  <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
-                      data-type="theme" value="Contextos Específicos"> Contextos Específicos</label>
-                </div>
-
+              <div id="admin-q-filters"
+                style="background:var(--color-surface); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--color-border); margin-bottom: 1.5rem;">
                 <div
-                  style="flex:1; min-width:200px; display:flex; flex-direction:column; gap:0.5rem; justify-content:center;">
-                  <input type="text" id="q-filter-source" class="input-field" placeholder="🏛️ Buscar por Fonte..."
-                    style="padding:0.5rem 0.8rem; font-size:0.8rem;">
-                  <input type="text" id="q-filter-content" class="input-field" placeholder="🧠 Buscar por Habilidade..."
-                    style="padding:0.5rem 0.8rem; font-size:0.8rem;">
+                  style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+                  <h4 style="margin-bottom:0; font-size:0.95rem;">🔬 Filtros do Banco</h4>
+                  <label
+                    style="background:#e0e7ff; color:#3730a3; border: 1px solid #a5b4fc; border-radius:1rem; padding: 0.3rem 0.8rem; font-size: 0.8rem; font-weight: bold; cursor:pointer;"
+                    title="Mostra apenas as questões adicionadas no último envio de JSON">
+                    <input type="checkbox" class="q-filter" data-type="recent" value="true"
+                      style="margin-right: 0.3rem;">
+                    ✨ Mostrar apenas Último Lote
+                  </label>
+                  <button id="q-filter-clear-btn" class="btn btn-secondary"
+                    style="padding:0.2rem 0.6rem; font-size:0.75rem;">Limpar Filtros</button>
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap: 1rem; font-size:0.8rem;">
+
+                  <div style="flex:1; min-width:140px;">
+                    <strong style="color:var(--color-primary);">📁 Nível</strong>
+                    <label style="display:block; margin-top:0.3rem; cursor:pointer;"><input type="checkbox"
+                        class="q-filter" data-type="level" value="Nível Júnior"> Júnior / Fundamental I</label>
+                    <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
+                        data-type="level" value="Nível 1"> Nível 1</label>
+                    <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
+                        data-type="level" value="Nível 2"> Nível 2</label>
+                    <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
+                        data-type="level" value="Nível 3"> Nível 3</label>
+                    <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
+                        data-type="level" value="Nível Livre"> Nível Livre</label>
+                  </div>
+
+                  <div style="flex:1; min-width:120px;">
+                    <strong style="color:var(--color-primary);">⚖️ Dificuldade</strong>
+                    <label style="display:block; margin-top:0.3rem; cursor:pointer;"><input type="checkbox"
+                        class="q-filter" data-type="difficulty" value="Fácil"> Fácil</label>
+                    <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
+                        data-type="difficulty" value="Média"> Média</label>
+                    <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
+                        data-type="difficulty" value="Difícil"> Difícil</label>
+                  </div>
+
+                  <div style="flex:1; min-width:180px;">
+                    <strong style="color:var(--color-primary);">📌 Tema Oficial</strong>
+                    <label style="display:block; margin-top:0.3rem; cursor:pointer;"><input type="checkbox"
+                        class="q-filter" data-type="theme" value="Temas Globais"> Temas Globais</label>
+                    <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
+                        data-type="theme" value="Tecnologia e Mídia"> Tecnologia e Mídia</label>
+                    <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
+                        data-type="theme" value="Linguagem em Contexto"> Linguagem Contexto</label>
+                    <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
+                        data-type="theme" value="Habilidades de Leitura/Audição"> Leitura/Audição</label>
+                    <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
+                        data-type="theme" value="Contextos Específicos"> Contextos Específicos</label>
+                  </div>
+
+                  <div
+                    style="flex:1; min-width:200px; display:flex; flex-direction:column; gap:0.5rem; justify-content:center;">
+                    <input type="text" id="q-filter-source" class="input-field" placeholder="🏛️ Buscar por Fonte..."
+                      style="padding:0.5rem 0.8rem; font-size:0.8rem;">
+                    <input type="text" id="q-filter-content" class="input-field"
+                      placeholder="🧠 Buscar por Habilidade..." style="padding:0.5rem 0.8rem; font-size:0.8rem;">
+                  </div>
                 </div>
               </div>
             </div>

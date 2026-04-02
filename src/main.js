@@ -140,6 +140,15 @@ async function initApp() {
     window.refreshQuestionBankList();
   });
 
+  // Toggle para Mostrar/Ocultar Filtros e Resumo
+  document.getElementById('toggle-filters-btn')?.addEventListener('click', (e) => {
+    const wrapper = document.getElementById('admin-filters-summary-wrapper');
+    if (wrapper) {
+      wrapper.classList.toggle('hidden');
+      e.target.textContent = wrapper.classList.contains('hidden') ? 'Mostrar Filtros e Resumo' : 'Ocultar Filtros e Resumo';
+    }
+  });
+
   // Check if someone is logged in
   currentUser = await getUser();
 
