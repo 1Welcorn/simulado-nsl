@@ -1,0 +1,29 @@
+
+> obli-2026-1-simulado@0.0.1 build
+> vite build
+
+[36mvite v5.4.21 [32mbuilding for production...[36m[39m
+transforming...
+[32mΓ£ô[39m 3 modules transformed.
+x Build failed in 100ms
+error during build:
+src/main.js (736:15): Identifier "initApp" has already been declared
+file: C:/Users/Willians Antoniazzi/Documents/cria├º├úo de apps e html/obli-2026-1-simulado/src/main.js:736:15
+
+734: 
+735: // Bootstrap
+736: async function initApp() {
+                    ^
+737:   await fetchAppMasterData();
+738:   setupUIHandlers();
+
+    at getRollupError (file:///C:/Users/Willians%20Antoniazzi/Documents/cria%C3%A7%C3%A3o%20de%20apps%20e%20html/obli-2026-1-simulado/node_modules/rollup/dist/es/shared/parseAst.js:406:41)
+    at error (file:///C:/Users/Willians%20Antoniazzi/Documents/cria%C3%A7%C3%A3o%20de%20apps%20e%20html/obli-2026-1-simulado/node_modules/rollup/dist/es/shared/parseAst.js:402:42)
+    at Module.error (file:///C:/Users/Willians%20Antoniazzi/Documents/cria%C3%A7%C3%A3o%20de%20apps%20e%20html/obli-2026-1-simulado/node_modules/rollup/dist/es/shared/node-entry.js:17380:16)
+    at ModuleScope.addDeclaration (file:///C:/Users/Willians%20Antoniazzi/Documents/cria%C3%A7%C3%A3o%20de%20apps%20e%20html/obli-2026-1-simulado/node_modules/rollup/dist/es/shared/node-entry.js:5577:21)
+    at ModuleScope.addDeclaration (file:///C:/Users/Willians%20Antoniazzi/Documents/cria%C3%A7%C3%A3o%20de%20apps%20e%20html/obli-2026-1-simulado/node_modules/rollup/dist/es/shared/node-entry.js:15382:22)
+    at Identifier.declare (file:///C:/Users/Willians%20Antoniazzi/Documents/cria%C3%A7%C3%A3o%20de%20apps%20e%20html/obli-2026-1-simulado/node_modules/rollup/dist/es/shared/node-entry.js:5462:35)
+    at FunctionDeclaration.initialise (file:///C:/Users/Willians%20Antoniazzi/Documents/cria%C3%A7%C3%A3o%20de%20apps%20e%20html/obli-2026-1-simulado/node_modules/rollup/dist/es/shared/node-entry.js:6892:18)
+    at FunctionDeclaration.initialise (file:///C:/Users/Willians%20Antoniazzi/Documents/cria%C3%A7%C3%A3o%20de%20apps%20e%20html/obli-2026-1-simulado/node_modules/rollup/dist/es/shared/node-entry.js:6910:15)
+    at convertNode (file:///C:/Users/Willians%20Antoniazzi/Documents/cria%C3%A7%C3%A3o%20de%20apps%20e%20html/obli-2026-1-simulado/node_modules/rollup/dist/es/shared/node-entry.js:16774:10)
+    at convertNodeList (file:///C:/Users/Willians%20Antoniazzi/Documents/cria%C3%A7%C3%A3o%20de%20apps%20e%20html/obli-2026-1-simulado/node_modules/rollup/dist/es/shared/node-entry.js:16784:38)

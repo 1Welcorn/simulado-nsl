@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OBLI 2026-1 Simulado</title>
+  <meta name="description" content="Plataforma de simulado com acesso inteligente por perfil." />
+
+  <!-- Premium Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <style>
+    /* ---------------------------------
+       DESIGN SYSTEM & VARIABLES 
+       --------------------------------- */
+    :root {
+      --font-main: "Outfit", sans-serif;
+      --color-bg: #f3f6f9;
+      --color-surface: rgba(255, 255, 255, 0.7);
+      --color-surface-hover: rgba(255, 255, 255, 0.9);
+      --color-border: rgba(0, 0, 0, 0.08);
+      --color-text: #1e293b;
+      --color-text-muted: #64748b;
+      --color-primary: #0f172a;
+      --color-primary-hover: #1e293b;
+      --color-accent: #3b82f6;
+      --color-accent-hover: #2563eb;
+      --color-success: #10b981;
+      --color-warning: #f59e0b;
+      --color-danger: #ef4444;
+
+      --radius-md: 12px;
+      --radius-lg: 20px;
+      --radius-full: 9999px;
+
+      --shadow-soft: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+      --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.3);
+
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--color-bg);
+      background-image:
+        radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 0.03) 0, transparent 50%),
+        radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 0.03) 0, transparent 50%),
+        radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 0.03) 0, transparent 50%);
+      color: var(--color-text);
+      font-family: var(--font-main);
+      font-size: 16px;
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---------------------------------
+       UTILITIES & ANIMATIONS
+       --------------------------------- */
+    .hidden {
+      display: none !important;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .view-section {
+      flex: 1;
+      animation: fadeIn 0.5s ease-out forwards;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+      width: 100%;
+    }
+
+    /* ---------------------------------
+       TOP NAVBAR
+       --------------------------------- */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: rgba(255, 255, 255, 0.6);
+      border-bottom: 1px solid var(--color-border);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      font-weight: 800;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+      color: var(--color-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--color-accent), #60a5fa);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 800;
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    /* ---------------------------------
+       BUTTONS & INPUTS
+       --------------------------------- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius-full);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border: none;
+      transition: var(--transition);
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      background: var(--color-accent);
+      color: white;
+      box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.39);
+    }
+
+    .btn-primary:hover {
+      background: var(--color-accent-hover);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.23);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
+    }
+
+    .btn-secondary:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .btn-danger {
+      background: #fef2f2;
+      color: var(--color-danger);
+      border: 1px solid #fecaca;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      background: rgba(255, 255, 255, 0.8);
+      font-family: inherit;
+      font-size: 1rem;
+      color: var(--color-text);
+      transition: var(--transition);
+      outline: none;
+    }
+
+    .input-field:focus {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+      background: white;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--color-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    /* ---------------------------------
+       CARDS & CONTAINERS (Glassmorphism)
+       --------------------------------- */
+    .glass-card {
+      background: var(--color-surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .admin-container {
+      max-width: 1200px;
+      width: 100%;
+      padding: 0 1rem;
+    }
+
+    /* ---------------------------------
+       TYPOGRAPHY
+       --------------------------------- */
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.5rem;
+      line-height: 1.1;
+    }
+
+    h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      color: var(--color-text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    /* ---------------------------------
+       SPECIFIC VIEWS
+       --------------------------------- */
+    /* View: Aluno Gate */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    /* View: Quiz */
+    .quiz-card {
+      max-width: 800px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--color-accent), #60a5fa);
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    .option-label {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.25rem;
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-md);
+      margin-bottom: 0.75rem;
+      cursor: pointer;
+      transition: var(--transition);
+      background: white;
+      font-weight: 500;
+    }
+
+    .option-label:hover {
+      border-color: #cbd5e1;
+      background: #f8fafc;
+    }
+
+    .option-label input {
+      margin-right: 1rem;
+      transform: scale(1.2);
+      accent-color: var(--color-accent);
+    }
+
+    /* View: Admin */
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: 1.5rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-master {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .badge-teacher {
+      background: #e0e7ff;
+      color: #4338ca;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: white;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 1rem 1.5rem;
+      text-align: left;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .data-table th {
+      background: #f8fafc;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .data-table tr:hover td {
+      background: #f1f5f9;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    /* Print Styles */
+    @media print {
+
+      .topbar,
+      .admin-header,
+      .btn,
+      select,
+      input,
+      #tab-results,
+      #tab-questions,
+      #tab-teachers {
+        display: none !important;
+      }
+
+      body {
+        background: white !important;
+        padding: 0 !important;
+        color: black !important;
+      }
+
+      .data-table {
+        box-shadow: none;
+        border: 1px solid #ccc;
+      }
+
+      .data-table th,
+      .data-table td {
+        border-bottom: 1px solid #ccc !important;
+        padding: 0.5rem !important;
+      }
+
+      .admin-container {
+        padding: 0 !important;
+        max-width: 100% !important;
+      }
+
+      .view-section {
+        padding: 0 !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- TOP NAV -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">O</div>
+      OBLI 2026-1
+    </div>
+    <div class="topbar-actions">
+      <div id="user-info" class="hidden" style="font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted);">
+      </div>
+      <button id="go-home-btn" class="btn btn-secondary hidden">Início</button>
+      <button id="go-admin-btn" class="btn btn-primary">Acesso Restrito</button>
+    </div>
+  </header>
+
+  <!-- ==========================================
+       VIEW 1: ALUNO (GATE)
+       ========================================== -->
+  <main id="view-student-gate" class="view-section">
+    <div class="glass-card">
+      <h1>Bem-vindo ao Simulado!</h1>
+      <p>Sua chance de testar seus conhecimentos. Preencha seus dados para iniciar a avaliação sem burocracia.</p>
+
+      <form id="student-form">
+        <div class="form-group">
+          <label for="student-name">Nome Completo</label>
+          <input type="text" id="student-name" class="input-field" placeholder="Ex: Ana Silva Costa" required
+            autocomplete="off" />
+        </div>
+
+        <div class="form-group">
+          <label for="student-grade">Série / Nível Escolar</label>
+          <select id="student-grade" class="input-field" required>
+            <option value="" disabled selected>Selecione seu nível de prova</option>
+            <option value="Nível Júnior">Nível Júnior (4º, 5º ano e EJA I)</option>
+            <option value="Nível 1">Nível 1 (6º e 7º anos)</option>
+            <option value="Nível 2">Nível 2 (8º, 9º e EJA II)</option>
+            <option value="Nível 3">Nível 3 (Ensino Médio e EJA III)</option>
+            <option value="Nível Livre">Nível Livre (Adultos, Formados)</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary"
+          style="width: 100%; padding: 1rem; font-size: 1.1rem; margin-top: 1rem;">
+          Iniciar Avaliação Agora
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <!-- ==========================================
+       VIEW 2: QUIZ
+       ========================================== -->
+  <main id="view-quiz" class="view-section hidden">
+    <div class="glass-card quiz-card">
+      <div class="progress-bar">
+        <div id="quiz-progress" class="progress-fill"></div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; margin-bottom: 1rem;">
+        <span style="font-weight: 700; color: var(--color-accent);" id="quiz-counter">Questão 1 de X</span>
+        <span style="font-weight: 600; color: var(--color-text-muted);" id="quiz-student-name">Aluno</span>
+      </div>
+
+      <h2 id="q-title" style="font-size: 1.4rem;">Carregando pergunta...</h2>
+      <div id="q-image-container" class="hidden"
+        style="margin-top: 1.5rem; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--color-border); max-width: 100%; text-align: center; background: white;">
+        <img id="q-image" src="" alt="Contexto da Pergunta"
+          style="max-height: 400px; width: auto; max-width: 100%; display: inline-block; padding: 0.5rem;" />
+      </div>
+
+      <div id="q-options" style="margin-top: 2rem; margin-bottom: 2rem;">
+        <!-- Inject Options via JS -->
+      </div>
+
+      <div style="display:flex; justify-content:flex-end;">
+        <button id="quiz-next-btn" class="btn btn-primary">Próxima Questão ➔</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==========================================
+       VIEW 3: RESULTS
+       ========================================== -->
+  <main id="view-result" class="view-section hidden">
+    <div class="glass-card" style="text-align: center;">
+      <div style="font-size: 4rem; margin-bottom: 1rem;">🎉</div>
+      <h1>Avaliação Concluída!</h1>
+      <p>Excelente trabalho. Seu resultado foi gravado com sucesso no sistema da escola.</p>
+
+      <div
+        style="background: white; border-radius: var(--radius-lg); padding: 2rem; margin: 2rem 0; box-shadow: var(--shadow-soft);">
+        <div style="font-size: 3.5rem; font-weight: 800; color: var(--color-primary); line-height: 1;"
+          id="result-score-number">0</div>
+        <div
+          style="font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.5rem; font-size: 0.85rem;">
+          Acertos Totais</div>
+      </div>
+
+      <button id="go-ranking-btn" class="btn btn-secondary" style="width: 100%;">Ver Ranking Público da minha
+        Turma</button>
+    </div>
+  </main>
+
+  <!-- ==========================================
+       VIEW 4: DASHBOARD (ADMIN / TEACHERS)
+       ========================================== -->
+  <main id="view-admin" class="view-section hidden">
+    <div class="admin-container">
+
+      <div class="admin-header">
+        <div>
+          <h1 id="admin-welcome-title">Carregando Painel...</h1>
+          <p id="admin-welcome-desc">Acesso seguro via Supabase RLS.</p>
+        </div>
+        <div style="text-align: right;">
+          <span id="role-badge" class="badge">Autenticando...</span>
+          <div style="margin-top: 0.5rem;">
+            <button id="logout-btn" class="btn btn-danger" style="padding: 0.4rem 1rem; font-size: 0.8rem;">Sair /
+              Logout</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin Tabs -->
+      <div style="display:flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+        <button id="tab-results" class="btn btn-primary">Resultados e Notas</button>
+        <button id="tab-questions" class="btn btn-secondary hidden">Gerenciar Questões</button>
+        <button id="tab-teachers" class="btn btn-secondary hidden">Professores Auxiliares</button>
+      </div>
+
+      <!-- Tab Content: Results -->
+      <section id="admin-pnl-results">
+        <div
+          style="background:var(--color-surface); padding: 1.5rem; border-radius: var(--radius-lg); border: 1px solid var(--color-border); margin-bottom: 1.5rem;">
+          <div
+            style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
+            <div style="flex: 1;">
+              <h3>Filtros de Nível</h3>
+              <p style="margin-bottom: 1rem;">Mude a tabela abaixo para imprimir os resultados por nível educacional.
+              </p>
+              <select id="admin-filter-grade" class="input-field" style="max-width: 300px;">
+                <option value="all">Ver todos os Níveis (Geral)</option>
+                <option value="Nível Júnior">Somente Nível Júnior</option>
+                <option value="Nível 1">Somente Nível 1</option>
+                <option value="Nível 2">Somente Nível 2</option>
+                <option value="Nível 3">Somente Nível 3</option>
+                <option value="Nível Livre">Somente Nível Livre</option>
+              </select>
+            </div>
+
+            <button onclick="window.print()" class="btn btn-secondary" style="white-space: nowrap;">
+              🖨️ Imprimir Resultados
+            </button>
+          </div>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nome do Aluno</th>
+              <th>Turma</th>
+              <th>Nota / Acertos</th>
+              <th>Data de Entrega</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="admin-table-body">
+            <!-- Rows injected via JS -->
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Tab Content: Question Bank (Only Master Admin) -->
+      <section id="admin-pnl-questions" class="hidden">
+        <div class="grid-2">
+
+          <div class="glass-card" style="max-width: 100%;">
+            <h3>Nova Questão</h3>
+
+            <div class="grid-2">
+              <div class="form-group">
+                <label>Nível da Fase / Turma Alvo</label>
+                <select id="admin-q-level" class="input-field">
+                  <option value="Nível Júnior">Nível Júnior</option>
+                  <option value="Nível 1">Nível 1</option>
+                  <option value="Nível 2">Nível 2</option>
+                  <option value="Nível 3">Nível 3</option>
+                  <option value="Nível Livre">Nível Livre</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Dificuldade</label>
+                <select id="admin-q-diff" class="input-field">
+                  <option value="Fácil">Fácil</option>
+                  <option value="Média" selected>Média</option>
+                  <option value="Difícil">Difícil</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="form-group">
+                <label>Tema / Categoria Oficial</label>
+                <select id="admin-q-theme" class="input-field">
+                  <option value="Temas Globais">Temas Globais</option>
+                  <option value="Tecnologia e Mídia">Tecnologia e Mídia</option>
+                  <option value="Linguagem em Contexto">Linguagem em Contexto</option>
+                  <option value="Habilidades de Leitura/Audição">Habilidades de Leitura/Audição</option>
+                  <option value="Contextos Específicos">Contextos Específicos</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Fonte / Vestibular / Ano (Opcional)</label>
+                <input type="text" id="admin-q-source" class="input-field" placeholder="Ex: ENEM 2023, Olimpíadas..." />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Habilidade / Conteúdo Abordado (Opcional)</label>
+              <input type="text" id="admin-q-skill" list="skills-list" class="input-field"
+                placeholder="Ex: Reading for Detail..." autocomplete="off" />
+              <datalist id="skills-list"></datalist>
+            </div>
+
+            <div class="form-group">
+              <label>Enunciado da Questão</label>
+              <textarea id="admin-q-text" class="input-field" rows="3" placeholder="Digite a pergunta..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Imagem da Questão (Opcional)</label>
+              <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:center;">
+                <input type="file" id="admin-q-file" accept="image/*" class="input-field"
+                  style="flex:1; padding: 0.75rem;" />
+                <span style="font-size:0.85rem; font-weight:600;">OU LINK DIRETO:</span>
+                <input type="url" id="admin-q-image" class="input-field" style="flex:2;" placeholder="https://..." />
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="form-group"><label>Opção A</label><input type="text" id="admin-q-opt0" class="input-field" />
+              </div>
+              <div class="form-group"><label>Opção B</label><input type="text" id="admin-q-opt1" class="input-field" />
+              </div>
+              <div class="form-group"><label>Opção C</label><input type="text" id="admin-q-opt2" class="input-field" />
+              </div>
+              <div class="form-group"><label>Opção D</label><input type="text" id="admin-q-opt3" class="input-field" />
+              </div>
+              <div class="form-group" style="grid-column: span 2;"><label>Opção E (Opcional)</label><input type="text"
+                  id="admin-q-opt4" class="input-field"
+                  placeholder="Deixe em branco se a questão tiver apenas 4 opções." /></div>
+            </div>
+
+            <div class="grid-2">
+              <div class="form-group">
+                <label>Gabarito Correto (Qual letra?)</label>
+                <select id="admin-q-ans" class="input-field">
+                  <option value="0">Opção A</option>
+                  <option value="1">Opção B</option>
+                  <option value="2">Opção C</option>
+                  <option value="3">Opção D</option>
+                  <option value="4">Opção E</option>
+                </select>
+              </div>
+            </div>
+
+            <button id="admin-save-q-btn" class="btn btn-primary" style="width: 100%;">Adicionar à Base</button>
+
+            <hr style="margin: 2rem 0; border: none; border-top: 1px dashed rgba(0,0,0,0.1);" />
+
+            <h3>Upload em Lote (JSON)</h3>
+            <p style="font-size: 0.85rem; margin-bottom: 0.5rem;">Cole um array com várias questões de uma vez. Formato:
+              <br><code>[ {"level":"Nível 1", "source":"ENEM 2023", "text":"Pergunta", "options":["A","B","C","D"], "answer":0 } ]</code>
+            </p>
+            <textarea id="admin-bulk-json" class="input-field" rows="4"
+              style="font-family: monospace; font-size: 0.85rem; background: #1e293b; color: #f8fafc;"
+              placeholder='[ { "level": "Nível 1", "source": "ENEM", "text": "Qual a capital?", "options": ["X","Y","W","Z"], "answer": 0 } ]'></textarea>
+
+            <div style="display:flex; gap:1rem; margin-top: 1rem;">
+              <button id="admin-bulk-btn" class="btn btn-primary" style="flex:2;">⬇️ Processar JSON</button>
+              <button id="admin-nuke-btn" class="btn btn-danger" style="flex:1;">💣 Zerar Banco</button>
+            </div>
+          </div>
+
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
+              <h3>Banco Atual</h3>
+            </div>
+
+            <div id="admin-q-summary" class="hidden"
+              style="background: #f8fafc; padding: 1rem; margin-bottom: 1.5rem; border-radius: var(--radius-md); border: 2px dashed #93c5fd;">
+              <!-- Injected by JS -->
+            </div>
+
+            <div id="admin-q-filters"
+              style="background:var(--color-surface); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--color-border); margin-bottom: 1.5rem;">
+              <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+                <h4 style="margin-bottom:0; font-size:0.95rem;">🔬 Filtros do Banco</h4>
+                <label
+                  style="background:#e0e7ff; color:#3730a3; border: 1px solid #a5b4fc; border-radius:1rem; padding: 0.3rem 0.8rem; font-size: 0.8rem; font-weight: bold; cursor:pointer;"
+                  title="Mostra apenas as questões adicionadas no último envio de JSON">
+                  <input type="checkbox" class="q-filter" data-type="recent" value="true" style="margin-right: 0.3rem;">
+                  ✨ Mostrar apenas Último Lote
+                </label>
+                <button id="q-filter-clear-btn" class="btn btn-secondary"
+                  style="padding:0.2rem 0.6rem; font-size:0.75rem;">Limpar Filtros</button>
+              </div>
+              <div style="display:flex; flex-wrap:wrap; gap: 1rem; font-size:0.8rem;">
+
+                <div style="flex:1; min-width:140px;">
+                  <strong style="color:var(--color-primary);">📁 Nível</strong>
+                  <label style="display:block; margin-top:0.3rem; cursor:pointer;"><input type="checkbox"
+                      class="q-filter" data-type="level" value="Nível Júnior"> Júnior / Fundamental I</label>
+                  <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
+                      data-type="level" value="Nível 1"> Nível 1</label>
+                  <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
+                      data-type="level" value="Nível 2"> Nível 2</label>
+                  <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
+                      data-type="level" value="Nível 3"> Nível 3</label>
+                  <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
+                      data-type="level" value="Nível Livre"> Nível Livre</label>
+                </div>
+
+                <div style="flex:1; min-width:120px;">
+                  <strong style="color:var(--color-primary);">⚖️ Dificuldade</strong>
+                  <label style="display:block; margin-top:0.3rem; cursor:pointer;"><input type="checkbox"
+                      class="q-filter" data-type="difficulty" value="Fácil"> Fácil</label>
+                  <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
+                      data-type="difficulty" value="Média"> Média</label>
+                  <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
+                      data-type="difficulty" value="Difícil"> Difícil</label>
+                </div>
+
+                <div style="flex:1; min-width:180px;">
+                  <strong style="color:var(--color-primary);">📌 Tema Oficial</strong>
+                  <label style="display:block; margin-top:0.3rem; cursor:pointer;"><input type="checkbox"
+                      class="q-filter" data-type="theme" value="Temas Globais"> Temas Globais</label>
+                  <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
+                      data-type="theme" value="Tecnologia e Mídia"> Tecnologia e Mídia</label>
+                  <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
+                      data-type="theme" value="Linguagem em Contexto"> Linguagem Contexto</label>
+                  <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
+                      data-type="theme" value="Habilidades de Leitura/Audição"> Leitura/Audição</label>
+                  <label style="display:block; cursor:pointer;"><input type="checkbox" class="q-filter"
+                      data-type="theme" value="Contextos Específicos"> Contextos Específicos</label>
+                </div>
+
+                <div
+                  style="flex:1; min-width:200px; display:flex; flex-direction:column; gap:0.5rem; justify-content:center;">
+                  <input type="text" id="q-filter-source" class="input-field" placeholder="🏛️ Buscar por Fonte..."
+                    style="padding:0.5rem 0.8rem; font-size:0.8rem;">
+                  <input type="text" id="q-filter-content" class="input-field" placeholder="🧠 Buscar por Habilidade..."
+                    style="padding:0.5rem 0.8rem; font-size:0.8rem;">
+                </div>
+              </div>
+            </div>
+
+            <div id="admin-q-list"
+              style="display:flex; flex-direction: column; gap: 0.5rem; max-height: 500px; overflow-y:auto; background:white; border-radius:var(--radius-md); padding:1rem; border:1px solid var(--color-border);">
+              <!-- list injected via JS -->
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Tab Content: Teachers (Only Master Admin) -->
+      <section id="admin-pnl-teachers" class="hidden">
+        <div class="glass-card" style="max-width: 100%;">
+          <h3>Professores Autorizados</h3>
+          <p>Libere o acesso ao painel de correção e notas adicionando o e-mail do Gmail dos seus professores.</p>
+
+          <div style="display:flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+            <input type="email" id="new-teacher-email" class="input-field" style="flex: 1;"
+              placeholder="E-mail do professor (ex: joao@gmail.com)">
+            <button id="add-teacher-btn" class="btn btn-primary" style="white-space: nowrap;">Autorizar Acesso</button>
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>E-mail Autorizado</th>
+                <th>Status da Conta</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="admin-teachers-list">
+              <!-- Rows injected via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>

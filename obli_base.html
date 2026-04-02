@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OBLI 2026-1 Simulado</title>
+  <meta name="description" content="Simulado interativo para OBLI 2026-1 com registro de estudante, fluxo de questões, resultados, ranking e painel de admin." />
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --font-family: 'Inter', sans-serif;
+      --primary-h: 220;
+      --primary-s: 80%;
+      --primary-l: 60%;
+      --bg-dark: hsl(220, 10%, 10%);
+      --bg-light: hsl(220, 10%, 95%);
+      --glass-bg: rgba(255, 255, 255, 0.12);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --accent: hsl(var(--primary-h), var(--primary-s), var(--primary-l));
+    }
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body {
+      font-family: var(--font-family);
+      background: linear-gradient(135deg, hsl(220, 30%, 15%), hsl(220, 30%, 8%));
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .container {
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 1rem;
+      width: 100%;
+      max-width: 800px;
+      padding: 2rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    }
+    h1, h2, h3 { margin-bottom: 1rem; font-weight: 600; }
+    button {
+      cursor: pointer;
+      background: var(--accent);
+      border: none;
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      transition: transform 0.2s, background 0.2s;
+    }
+    button:hover { transform: translateY(-2px); background: hsl(var(--primary-h), var(--primary-s), calc(var(--primary-l) + 5%)); }
+    input, select {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid var(--glass-border);
+      border-radius: 0.5rem;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+    }
+    .hidden { display: none; }
+    .question { margin-bottom: 1.5rem; }
+    .options label { display: block; margin-bottom: 0.5rem; cursor: pointer; }
+    .ranking-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    .ranking-table th, .ranking-table td { padding: 0.5rem; border: 1px solid var(--glass-border); }
+    .admin-panel, .question-bank { margin-top: 2rem; }
+    .print-btn { margin-top: 1rem; }
+    @media (max-width: 600px) {
+      .container { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Registration Gate -->
+    <section id="register" class="flow-section">
+      <h1>Bem‑vindo ao Simulado OBLI 2026‑1</h1>
+      <p>Insira seu nome e escolha a turma (sua nota será usada como filtro de professor).</p>
+      <input type="text" id="studentName" placeholder="Nome do estudante" />
+      <select id="studentGrade">
+        <option value="" disabled selected>Selecione sua série</option>
+        <option value="1">1ª Série</option>
+        <option value="2">2ª Série</option>
+        <option value="3">3ª Série</option>
+      </select>
+      <button id="startQuizBtn">Iniciar Simulado</button>
+    </section>
+
+    <!-- Quiz Flow -->
+    <section id="quiz" class="flow-section hidden">
+      <h2>Questões</h2>
+      <div id="questionContainer"></div>
+      <button id="nextBtn" class="hidden">Próxima</button>
+    </section>
+
+    <!-- Results Screen -->
+    <section id="results" class="flow-section hidden">
+      <h2>Resultado</h2>
+      <p id="scoreText"></p>
+      <button id="viewRankingBtn">Ver Ranking</button>
+    </section>
+
+    <!-- Ranking Screen -->
+    <section id="ranking" class="flow-section hidden">
+      <h2>Ranking</h2>
+      <table class="ranking-table" id="rankingTable">
+        <thead>
+          <tr><th>Posição</th><th>Nome</th><th>Pontuação</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button class="print-btn" onclick="window.print()">Imprimir Ranking</button>
+    </section>
+
+    <!-- Teacher/Admin Dashboard Scaffold -->
+    <section id="admin" class="flow-section hidden">
+      <h2>Painel do Professor/Administrador</h2>
+      <p>Filtrar por série: <select id="adminGradeFilter"><option value="all">Todas</option><option value="1">1ª Série</option><option value="2">2ª Série</option><option value="3">3ª Série</option></select></p>
+      <div class="admin-panel">
+        <h3>Estudantes Registrados</h3>
+        <ul id="studentList"></ul>
+      </div>
+      <div class="question-bank">
+        <h3>Banco de Questões</h3>
+        <button id="addQuestionBtn">Adicionar Questão</button>
+        <ul id="questionBankList"></ul>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ---- Supabase Hook (placeholder) ----
+    const SUPABASE_URL = 'https://YOUR-PROJECT.supabase.co';
+    const SUPABASE_ANON_KEY = 'YOUR-ANON-KEY';
+    // In a real implementation you would import the supabase-js client:
+    // const { createClient } = supabase;
+    // const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Sample data – replace with Supabase fetches later
+    const sampleQuestions = [
+      { id: 1, text: 'Qual a capital do Brasil?', options: ['São Paulo','Rio de Janeiro','Brasília','Salvador'], answer: 2 },
+      { id: 2, text: '2 + 2 = ?', options: ['3','4','5','22'], answer: 1 },
+      { id: 3, text: 'Qual a cor do céu?', options: ['Azul','Verde','Vermelho','Preto'], answer: 0 }
+    ];
+    let currentIdx = 0;
+    let score = 0;
+    let student = { name: '', grade: '' };
+    const studentRecords = [];
+    const rankings = [];
+    const questionBank = [...sampleQuestions];
+
+    // UI helpers
+    const $ = (id) => document.getElementById(id);
+    const show = (el) => el.classList.remove('hidden');
+    const hide = (el) => el.classList.add('hidden');
+
+    // Registration flow
+    $('startQuizBtn').addEventListener('click', () => {
+      const name = $('studentName').value.trim();
+      const grade = $('studentGrade').value;
+      if (!name || !grade) { alert('Preencha nome e série.'); return; }
+      student = { name, grade };
+      studentRecords.push({ ...student, score: 0 });
+      hide($('register'));
+      startQuiz();
+    });
+
+    function startQuiz() {
+      currentIdx = 0; score = 0;
+      renderQuestion();
+      show($('quiz'));
+    }
+
+    function renderQuestion() {
+      const q = sampleQuestions[currentIdx];
+      const container = $('questionContainer');
+      container.innerHTML = '';
+      const qDiv = document.createElement('div');
+      qDiv.className = 'question';
+      qDiv.innerHTML = `<p><strong>Questão ${currentIdx + 1}:</strong> ${q.text}</p>`;
+      const optsDiv = document.createElement('div');
+      optsDiv.className = 'options';
+      q.options.forEach((opt, i) => {
+        const id = `opt_${i}`;
+        optsDiv.innerHTML += `<label><input type="radio" name="options" id="${id}" value="${i}" /> ${opt}</label>`;
+      });
+      qDiv.appendChild(optsDiv);
+      container.appendChild(qDiv);
+      show($('nextBtn'));
+    }
+
+    $('nextBtn').addEventListener('click', () => {
+      const selected = document.querySelector('input[name="options"]:checked');
+      if (!selected) { alert('Selecione uma opção.'); return; }
+      const answerIdx = parseInt(selected.value);
+      if (answerIdx === sampleQuestions[currentIdx].answer) score++;
+      currentIdx++;
+      if (currentIdx < sampleQuestions.length) {
+        renderQuestion();
+      } else {
+        finishQuiz();
+      }
+    });
+
+    function finishQuiz() {
+      hide($('quiz'));
+      $('scoreText').textContent = `${student.name}, você acertou ${score} de ${sampleQuestions.length} questões.`;
+      // Update records
+      const rec = studentRecords.find(r => r.name === student.name && r.grade === student.grade);
+      if (rec) rec.score = score;
+      rankings.push({ name: student.name, grade: student.grade, score });
+      rankings.sort((a,b) => b.score - a.score);
+      show($('results'));
+    }
+
+    $('viewRankingBtn').addEventListener('click', () => {
+      hide($('results'));
+      const tbody = $('rankingTable').querySelector('tbody');
+      tbody.innerHTML = '';
+      rankings.forEach((r, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${idx+1}</td><td>${r.name}</td><td>${r.score}</td>`;
+        tbody.appendChild(tr);
+      });
+      show($('ranking'));
+    });
+
+    // Admin Dashboard – simple toggle (could be accessed via URL hash)
+    function initAdmin() {
+      const hash = location.hash;
+      if (hash === '#admin') {
+        hide($('register'));
+        hide($('quiz'));
+        hide($('results'));
+        hide($('ranking'));
+        populateAdminLists();
+        show($('admin'));
+      }
+    }
+
+    function populateAdminLists() {
+      const list = $('studentList');
+      list.innerHTML = '';
+      studentRecords.forEach(s => {
+        const li = document.createElement('li');
+        li.textContent = `${s.name} (Série ${s.grade}) - Pontuação: ${s.score}`;
+        list.appendChild(li);
+      });
+      const qList = $('questionBankList');
+      qList.innerHTML = '';
+      questionBank.forEach(q => {
+        const li = document.createElement('li');
+        li.textContent = `#${q.id}: ${q.text}`;
+        qList.appendChild(li);
+      });
+    }
+
+    // Grade filter for admin view
+    $('adminGradeFilter').addEventListener('change', () => {
+      const filter = $('adminGradeFilter').value;
+      const list = $('studentList');
+      list.innerHTML = '';
+      const filtered = filter === 'all' ? studentRecords : studentRecords.filter(s => s.grade === filter);
+      filtered.forEach(s => {
+        const li = document.createElement('li');
+        li.textContent = `${s.name} (Série ${s.grade}) - Pontuação: ${s.score}`;
+        list.appendChild(li);
+      });
+    });
+
+    // Add Question (admin)
+    $('addQuestionBtn').addEventListener('click', () => {
+      const text = prompt('Texto da questão:');
+      if (!text) return;
+      const opts = [];
+      for (let i=0;i<4;i++) {
+        const opt = prompt(`Opção ${i+1}:`);
+        if (!opt) return;
+        opts.push(opt);
+      }
+      const ans = prompt('Índice da resposta correta (0‑3):');
+      const answerIdx = parseInt(ans);
+      const newQ = { id: Date.now(), text, options: opts, answer: answerIdx };
+      questionBank.push(newQ);
+      populateAdminLists();
+    });
+
+    // Initialize
+    initAdmin();
+  </script>
+</body>
+</html>
