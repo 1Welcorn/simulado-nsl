@@ -95,7 +95,7 @@ window.updateSkillsDatalist = (level) => {
     dl.appendChild(opt);
   });
 };
-let student = { name: '', grade: '' };
+let student = { name: '', grade: '', cpf: '' };
 let currentUser = null;
 let role = 'student'; // 'student', 'teacher', 'master'
 let editingQuestionId = null;
@@ -187,11 +187,12 @@ async function initApp() {
 document.getElementById('student-form')?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const name = document.getElementById('student-name').value.trim();
+  let cpf = document.getElementById('student-cpf')?.value.trim() || 'Não informado';
   const grade = document.getElementById('student-grade').value; // Isto capturará "Nível Júnior", etc.
 
   if (!name || !grade) return alert('Por favor, preencha tudo!');
 
-  student = { name, grade };
+  student = { name, grade, cpf };
   currentQIdx = 0;
   score = 0;
 
@@ -199,7 +200,7 @@ document.getElementById('student-form')?.addEventListener('submit', async (e) =>
   questionBank = questionBankAll.filter(q => (q.level === student.grade || !q.level) && Boolean(q.is_active));
 
   // Register in database immediately as starting
-  await addStudentRecord({ name, grade, score: 0 });
+  await addStudentRecord({ name, grade, score: 0, cpf });
 
   const summaryEl = document.getElementById('quiz-student-summary');
   if (summaryEl) summaryEl.textContent = `Aluno(a) ${name} liberado para iniciar o simulado.`;
@@ -301,7 +302,7 @@ async function finishQuiz() {
 
   // Update final score in Supabase
   try {
-    await supabase.from('students').upsert({ name: student.name, grade: student.grade, score: score });
+    await supabase.from('students').upsert({ name: student.name, grade: student.grade, score: score, cpf: student.cpf });
   } catch (e) { console.error(e); }
 
   const scoreEl = document.getElementById('final-score');
@@ -369,20 +370,35 @@ async function loadAdminDashboard() {
 // -----------------------------------------
 // TABS NAVIGATION (ADMIN PANEL)
 // -----------------------------------------
-const adminTabs = document.querySelectorAll('.tab-btn');
-const adminSections = document.querySelectorAll('.admin-section');
+const adminTabButtons = {
+  results: document.getElementById('tab-results'),
+  questions: document.getElementById('tab-questions'),
+  teachers: document.getElementById('tab-teachers'),
+};
+const adminTabPanels = {
+  results: document.getElementById('admin-pnl-results'),
+  questions: document.getElementById('admin-pnl-questions'),
+  teachers: document.getElementById('admin-pnl-teachers'),
+};
 
-adminTabs.forEach(btn => {
-  btn.addEventListener('click', () => {
-    adminTabs.forEach(b => b.classList.remove('active'));
-    adminSections.forEach(s => s.classList.remove('active'));
-
-    btn.classList.add('active');
-    const targetId = btn.getAttribute('data-tab');
-    const targetPnl = document.getElementById(targetId);
-    if (targetPnl) targetPnl.classList.add('active');
+const handleTabClick = (tabName) => {
+  // Atualiza as cores dos botões
+  Object.values(adminTabButtons).forEach(btn => {
+    btn?.classList.remove('btn-primary');
+    btn?.classList.add('btn-secondary');
   });
-});
+
+  adminTabButtons[tabName]?.classList.remove('btn-secondary');
+  adminTabButtons[tabName]?.classList.add('btn-primary');
+
+  // Atualiza a visibilidade dos painéis
+  Object.values(adminTabPanels).forEach(panel => panel?.classList.add('hidden'));
+  adminTabPanels[tabName]?.classList.remove('hidden');
+};
+
+adminTabButtons.results?.addEventListener('click', () => handleTabClick('results'));
+adminTabButtons.questions?.addEventListener('click', () => handleTabClick('questions'));
+adminTabButtons.teachers?.addEventListener('click', () => handleTabClick('teachers'));
 
 navBtns.home?.addEventListener('click', () => {
   location.hash = '';
@@ -417,7 +433,7 @@ async function refreshAdminTable() {
       const d = s.created_at ? new Date(s.created_at).toLocaleDateString() : 'Hoje';
       tr.innerHTML = `
         <td>${idx + 1}</td>
-        <td style="font-weight:600;">${s.name}</td>
+        <td style="font-weight:600;">${s.name}<br><span style="font-size:0.75rem; color:var(--color-text-muted); font-weight:normal;">CPF: ${s.cpf || 'Não informado'}</span></td>
         <td><span style="background:#e2e8f0; color:#475569; padding:2px 8px; border-radius:12px; font-size:0.8rem;">${s.grade}</span></td>
         <td style="color:var(--color-success); font-weight:700;">${s.score} acertos</td>
         <td style="font-size:0.85rem; color:gray;">${d}</td>

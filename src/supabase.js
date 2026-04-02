@@ -88,8 +88,8 @@ export const fetchRankings = async () => {
   return data;
 };
 
-export async function addStudentRecord({ name, grade, score }) {
-  const { data, error } = await supabase.from('students').insert([{ name, grade, score }]);
+export async function addStudentRecord({ name, grade, score, cpf }) {
+  const { data, error } = await supabase.from('students').insert([{ name, grade, score, cpf }]);
   if (error) console.error('Erro ao adicionar aluno:', error);
   return data;
 }
