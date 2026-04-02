@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>OBLI 2026-1 SIMULADO</title>
-  <meta name="description" content="OBLI 2026-1 SIMULADO - plataforma de simulado com área do aluno, ranking e painel administrativo." />
+  <meta name="description"
+    content="OBLI 2026-1 SIMULADO - plataforma de simulado com área do aluno, ranking e painel administrativo." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
 
   <style>
     :root {
@@ -53,9 +57,9 @@
       --radius-xl: 1.25rem;
       --radius-full: 999px;
 
-      --shadow-sm: 0 1px 2px rgba(38,35,29,.05);
-      --shadow-md: 0 10px 30px rgba(38,35,29,.08);
-      --shadow-lg: 0 18px 40px rgba(38,35,29,.12);
+      --shadow-sm: 0 1px 2px rgba(38, 35, 29, .05);
+      --shadow-md: 0 10px 30px rgba(38, 35, 29, .08);
+      --shadow-lg: 0 18px 40px rgba(38, 35, 29, .12);
 
       --font-body: "Work Sans", sans-serif;
       --font-display: "Instrument Serif", serif;
@@ -64,13 +68,19 @@
       --content-wide: 1280px;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     html {
       scroll-behavior: smooth;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       text-rendering: optimizeLegibility;
     }
+
     body {
       min-height: 100dvh;
       background: var(--color-bg);
@@ -79,15 +89,51 @@
       font-size: var(--text-base);
       line-height: 1.6;
     }
-    img, svg { display: block; max-width: 100%; }
-    button, input, select, textarea { font: inherit; color: inherit; }
-    button { cursor: pointer; border: none; background: none; }
-    a { color: inherit; text-decoration: none; }
-    table { width: 100%; border-collapse: collapse; }
-    .hidden { display: none !important; }
+
+    img,
+    svg {
+      display: block;
+      max-width: 100%;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+      color: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
     .sr-only {
-      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-      overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
 
     .app-shell {
@@ -200,8 +246,8 @@
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(circle at top right, rgba(1,105,111,.10), transparent 35%),
-        radial-gradient(circle at bottom left, rgba(183,134,11,.08), transparent 30%);
+        radial-gradient(circle at top right, rgba(1, 105, 111, .10), transparent 35%),
+        radial-gradient(circle at bottom left, rgba(183, 134, 11, .08), transparent 30%);
       pointer-events: none;
     }
 
@@ -220,7 +266,9 @@
       text-transform: uppercase;
     }
 
-    h1, h2, h3 {
+    h1,
+    h2,
+    h3 {
       line-height: 1.1;
       text-wrap: balance;
     }
@@ -243,7 +291,8 @@
       font-weight: 700;
     }
 
-    p, li {
+    p,
+    li {
       color: var(--color-text-muted);
       max-width: 72ch;
     }
@@ -324,7 +373,9 @@
       transition: transform .16s ease, background .18s ease, color .18s ease, border-color .18s ease;
     }
 
-    .btn:hover { transform: translateY(-1px); }
+    .btn:hover {
+      transform: translateY(-1px);
+    }
 
     .btn-primary {
       background: var(--color-primary);
@@ -631,7 +682,7 @@
       border-radius: 999px;
       display: inline-block;
       background: var(--color-success);
-      box-shadow: 0 0 0 6px rgba(63,124,47,.12);
+      box-shadow: 0 0 0 6px rgba(63, 124, 47, .12);
     }
 
     .footer-note {
@@ -661,6 +712,7 @@
     }
 
     @media print {
+
       .topbar,
       .btn,
       .admin-tabs,
@@ -711,6 +763,7 @@
     }
   </style>
 </head>
+
 <body>
   <!--
     OBLI 2026-1 SIMULADO - V2 BASE
@@ -726,8 +779,10 @@
         <div class="brand">
           <div class="brand-mark" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none">
-              <path d="M5 6.5L12 3l7 3.5v5.2c0 4.4-2.6 7.6-7 9.3-4.4-1.7-7-4.9-7-9.3V6.5Z" stroke="currentColor" stroke-width="1.8"/>
-              <path d="M9 12.3l2 2 4-4.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M5 6.5L12 3l7 3.5v5.2c0 4.4-2.6 7.6-7 9.3-4.4-1.7-7-4.9-7-9.3V6.5Z" stroke="currentColor"
+                stroke-width="1.8" />
+              <path d="M9 12.3l2 2 4-4.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                stroke-linejoin="round" />
             </svg>
           </div>
           <div class="brand-copy">
@@ -754,7 +809,7 @@
             <div class="hero-card">
               <span class="eyebrow">Simulado seletivo</span>
               <div>
-                <h1>Uma base moderna para o OBLI 2026-1.</h1>
+                <h1>Uma base moderna para o OBLI 2026-1. (Deploy Automático Funcionando!)</h1>
                 <p>
                   Esta versão organiza o fluxo do aluno, ranking, painel docente e base para banco de questões,
                   mantendo o projeto preparado para integração segura posterior.
@@ -798,7 +853,8 @@
                   <div class="grid-2">
                     <div class="field">
                       <label for="student-name">Nome do aluno</label>
-                      <input id="student-name" name="student_name" type="text" placeholder="Digite o nome completo" required />
+                      <input id="student-name" name="student_name" type="text" placeholder="Digite o nome completo"
+                        required />
                     </div>
 
                     <div class="field">
@@ -819,7 +875,8 @@
                   <div class="grid-2">
                     <div class="field">
                       <label for="student-age">Idade</label>
-                      <input id="student-age" name="age" type="number" min="8" max="30" placeholder="Ex.: 14" required />
+                      <input id="student-age" name="age" type="number" min="8" max="30" placeholder="Ex.: 14"
+                        required />
                     </div>
 
                     <div class="field">
@@ -836,13 +893,15 @@
 
                   <div class="field">
                     <label for="student-school">Escola / observação</label>
-                    <input id="student-school" name="school" type="text" placeholder="Campo base para futura expansão" />
+                    <input id="student-school" name="school" type="text"
+                      placeholder="Campo base para futura expansão" />
                     <p class="help">Observação: no schema atual compartilhado, grade é o filtro principal de grupo.</p>
                   </div>
 
                   <div class="pill-row">
                     <button class="btn btn-primary" type="submit">Liberar acesso à prova</button>
-                    <button class="btn btn-ghost" type="button" id="preview-student-data-btn">Pré-visualizar dados</button>
+                    <button class="btn btn-ghost" type="button" id="preview-student-data-btn">Pré-visualizar
+                      dados</button>
                   </div>
                 </form>
               </div>
