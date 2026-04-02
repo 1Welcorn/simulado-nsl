@@ -434,7 +434,7 @@ async function refreshAdminTable() {
         <td style="color:var(--color-success); font-weight:700;">${s.score} acertos</td>
         <td style="font-size:0.85rem; color:gray;">${d}</td>
         <td>
-          <button class="btn btn-danger" style="padding:0.3rem 0.6rem; font-size:0.75rem;" onclick="window.deleteStudentResult(${s.id})">Apagar</button>
+          <button class="btn btn-danger" style="padding:0.3rem 0.6rem; font-size:0.75rem;" onclick="window.deleteStudentResult('${s.id}')">Apagar</button>
         </td>
       `;
       tbody.appendChild(tr);
