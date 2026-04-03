@@ -772,21 +772,21 @@ window.refreshQuestionBankList = () => {
         
         <div style="text-align:center; margin-bottom: 1rem;"><span style="background:var(--color-bg); padding: 0.2rem 1rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; border: 1px solid var(--color-border); color: var(--color-text);">👀 VISÃO DO ALUNO</span></div>
         
-        <h2 style="font-size: clamp(1.4rem, 2vw + 0.8rem, 2.2rem); line-height: 1.4; margin-bottom: 1.5rem; color: var(--color-text); white-space: pre-wrap;">${q.source ? `<span style="font-size: 0.85rem; font-weight: 500; color: var(--color-primary); display:block; margin-bottom: 0.8rem; background: #e0e7ff; padding: 0.2rem 0.6rem; border-radius: 4px; border: 1px dashed #a5b4fc; width: fit-content;">🏛️ Fonte: ${q.source}</span>` : ''}${q.text}</h2>
+        <h2 style="font-size: clamp(1.2rem, 1.5vw + 0.5rem, 1.8rem); line-height: 1.3; margin-bottom: 1rem; color: var(--color-text); white-space: pre-wrap;">${q.source ? `<span style="font-size: 0.85rem; font-weight: 500; color: var(--color-primary); display:block; margin-bottom: 0.8rem; background: #e0e7ff; padding: 0.2rem 0.6rem; border-radius: 4px; border: 1px dashed #a5b4fc; width: fit-content;">🏛️ Fonte: ${q.source}</span>` : ''}${q.text}</h2>
         
         ${q.image_url ? `
         <div style="margin-top: 1.5rem; margin-bottom: 1.5rem; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--color-border); max-width: 100%; text-align: center; background: white;">
              <img src="${q.image_url}" alt="Contexto da Pergunta" style="max-height: 400px; width: auto; max-width: 100%; display: inline-block; padding: 0.5rem;" />
         </div>` : ''}
         
-        <div style="display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1rem;">
+        <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem;">
           ${(q.options || []).map((opt, idx) => {
       if (!opt) return '';
       const isCorrect = q.answer === idx;
       const bg = isCorrect ? 'var(--color-success)' : 'transparent';
       const color = isCorrect ? 'white' : 'var(--color-text)';
       return `
-              <div style="display: block; width: 100%; text-align: left; background: ${bg}; color: ${color}; border: 2px solid ${isCorrect ? 'var(--color-success)' : 'var(--color-border)'}; border-radius: var(--radius-lg); padding: clamp(1rem, 2vw, 1.5rem) clamp(1.2rem, 2.5vw, 2rem); font-size: clamp(1.1rem, 1.5vw + 0.5rem, 1.6rem); font-weight: 500;">
+              <div style="display: block; width: 100%; text-align: left; background: ${bg}; color: ${color}; border: 2px solid ${isCorrect ? 'var(--color-success)' : 'var(--color-border)'}; border-radius: var(--radius-md); padding: clamp(0.6rem, 1vw, 1rem) clamp(1rem, 1.5vw, 1.5rem); font-size: clamp(1rem, 1.2vw + 0.2rem, 1.3rem); font-weight: 500;">
                 ${['A', 'B', 'C', 'D', 'E'][idx] || 'X'}) ${opt}
               </div>
             `;
