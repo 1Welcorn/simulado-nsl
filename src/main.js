@@ -454,7 +454,7 @@ async function loadAdminDashboard() {
   await refreshAdminTable();
   if (role === 'master') {
     refreshQuestionBankList();
-    refreshTeachersList();
+    loadTeachersFromDB();
   }
 }
 
@@ -980,17 +980,43 @@ window.deleteQuestion = async (id) => {
 };
 
 // -----------------------------------------
-// TEACHER MANAGEMENT MOCK (Admin Principal)
+// TEACHER MANAGEMENT (Admin Principal)
 // -----------------------------------------
-let authorizedTeachers = ['angela.matematica@gmail.com', 'carlos.historia@gmail.com'];
+let authorizedTeachers = [];
 
-document.getElementById('add-teacher-btn')?.addEventListener('click', () => {
-  const email = document.getElementById('new-teacher-email').value.trim();
+async function loadTeachersFromDB() {
+  try {
+    const { data, error } = await supabase.from('teachers').select('*');
+    if (error) throw error;
+    authorizedTeachers = data ? data.map(t => t.email) : [];
+    refreshTeachersList();
+  } catch (err) {
+    console.error('Erro ao carregar professores:', err);
+  }
+}
+
+document.getElementById('add-teacher-btn')?.addEventListener('click', async () => {
+  const email = document.getElementById('new-teacher-email').value.trim().toLowerCase();
   if (!email) return alert('Digite o e-mail do professor!');
-  authorizedTeachers.push(email);
-  document.getElementById('new-teacher-email').value = '';
-  refreshTeachersList();
-  alert('Professor adicionado! (Em produção, isso seria salvo em uma tabela Supabase)');
+
+  const btn = document.getElementById('add-teacher-btn');
+  btn.textContent = 'Salvando...';
+  btn.disabled = true;
+
+  try {
+    const { error } = await supabase.from('teachers').insert([{ email }]);
+    if (error) throw error;
+
+    authorizedTeachers.push(email);
+    document.getElementById('new-teacher-email').value = '';
+    refreshTeachersList();
+    alert('Professor adicionado e salvo no Supabase com sucesso!');
+  } catch (err) {
+    alert('Erro ao adicionar professor: ' + err.message);
+  } finally {
+    btn.textContent = 'Autorizar Acesso';
+    btn.disabled = false;
+  }
 });
 
 function refreshTeachersList() {
@@ -1002,11 +1028,26 @@ function refreshTeachersList() {
     tr.innerHTML = `
       <td style="font-weight:600; color:var(--color-text);">${t}</td>
       <td><span class="badge badge-teacher">Acesso Liberado</span></td>
-      <td><button class="btn btn-danger" style="padding:0.4rem 0.8rem; font-size:0.8rem;" onclick="alert('Funcionalidade de exclusão conectada ao Supabase!')">Remover</button></td>
+      <td><button class="btn btn-danger" style="padding:0.4rem 0.8rem; font-size:0.8rem;" onclick="window.removeTeacher('${t}')">Remover</button></td>
     `;
     list.appendChild(tr);
   });
 }
+
+window.removeTeacher = async (email) => {
+  if (confirm(`Tem certeza que deseja remover o acesso do professor ${email}?`)) {
+    try {
+      const { error } = await supabase.from('teachers').delete().eq('email', email);
+      if (error) throw error;
+
+      authorizedTeachers = authorizedTeachers.filter(t => t !== email);
+      refreshTeachersList();
+      alert('Acesso do professor removido com sucesso!');
+    } catch (err) {
+      alert('Erro ao remover professor: ' + err.message);
+    }
+  }
+};
 
 // Bootstrap
 document.addEventListener('DOMContentLoaded', initApp);
