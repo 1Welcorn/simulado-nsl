@@ -251,6 +251,12 @@ document.getElementById('student-form')?.addEventListener('submit', async (e) =>
     // FILTRA as questões APENAS para o Nível que o estudante selecionou E que estejam ATIVAS na prova
     questionBank = questionBankAll.filter(q => (q.level === student.grade || !q.level) && Boolean(q.is_active));
 
+    // EMBARALHA (Shuffle) as questões para evitar cola (Algoritmo Fisher-Yates)
+    for (let i = questionBank.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [questionBank[i], questionBank[j]] = [questionBank[j], questionBank[i]];
+    }
+
     // Register in database immediately as starting
     await addStudentRecord({ name, grade, score: 0, cpf: email });
 
