@@ -444,6 +444,10 @@
 
     /* Print Styles */
     @media print {
+      @page {
+        margin: 1.5cm;
+        size: A4 portrait;
+      }
 
       .topbar,
       .admin-header,
@@ -452,7 +456,8 @@
       input,
       #tab-results,
       #tab-questions,
-      #tab-teachers {
+      #tab-teachers,
+      #admin-filters-box {
         display: none !important;
       }
 
@@ -462,17 +467,6 @@
         color: black !important;
       }
 
-      .data-table {
-        box-shadow: none;
-        border: 1px solid #ccc;
-      }
-
-      .data-table th,
-      .data-table td {
-        border-bottom: 1px solid #ccc !important;
-        padding: 0.5rem !important;
-      }
-
       .admin-container {
         padding: 0 !important;
         max-width: 100% !important;
@@ -480,6 +474,66 @@
 
       .view-section {
         padding: 0 !important;
+      }
+
+      /* Custom Print Header for Results */
+      #admin-pnl-results::before {
+        content: "Relatório Oficial de Notas - NSL OBLI 2026-1 SIMULADO";
+        display: block;
+        font-size: 1.6rem;
+        font-weight: 800;
+        text-align: center;
+        color: #000;
+        border-bottom: 2px solid #000;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      /* Modern Table for Print */
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        box-shadow: none !important;
+        border: none !important;
+      }
+
+      .data-table th,
+      .data-table td {
+        border: 1px solid #ddd !important;
+        padding: 0.75rem !important;
+        color: #000 !important;
+      }
+
+      .data-table th {
+        background-color: #f8fafc !important;
+        font-weight: 700 !important;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .data-table tr:nth-child(even) td {
+        background-color: #fbfbfb !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      /* Oculta Exatamente a Coluna 6 (Ações) */
+      .data-table th:nth-child(6),
+      .data-table td:nth-child(6) {
+        display: none !important;
+      }
+
+      /* Print Footer */
+      #admin-pnl-results::after {
+        content: "Documento gerado eletronicamente. Classificação Confidencial.";
+        display: block;
+        text-align: center;
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-top: 2rem;
+        font-style: italic;
       }
     }
   </style>
