@@ -8,6 +8,7 @@ const views = {
   gate: document.getElementById('view-student-gate'),
   quiz: document.getElementById('view-quiz'),
   result: document.getElementById('view-result'),
+  ranking: document.getElementById('view-public-ranking'),
   admin: document.getElementById('view-admin'),
 };
 
@@ -220,27 +221,49 @@ async function initApp() {
 document.getElementById('student-form')?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const name = document.getElementById('student-name').value.trim();
-  let cpf = document.getElementById('student-cpf')?.value.trim() || 'Não informado';
+  const email = document.getElementById('student-email').value.trim().toLowerCase();
   const grade = document.getElementById('student-grade').value; // Isto capturará "Nível Júnior", etc.
 
-  if (!name || !grade) return alert('Por favor, preencha tudo!');
+  if (!name || !grade || !email) return alert('Por favor, preencha todos os campos!');
 
-  student = { name, grade, cpf };
-  currentQIdx = 0;
-  score = 0;
+  if (!email.includes('@escola')) {
+    return alert('Acesso Negado: É obrigatório utilizar o seu e-mail institucional (@escola...) para realizar o simulado.');
+  }
 
-  // FILTRA as questões APENAS para o Nível que o estudante selecionou E que estejam ATIVAS na prova
-  questionBank = questionBankAll.filter(q => (q.level === student.grade || !q.level) && Boolean(q.is_active));
+  const btn = e.target.querySelector('button[type="submit"]');
+  const oldText = btn.textContent;
+  btn.textContent = 'Verificando autorização...';
+  btn.disabled = true;
 
-  // Register in database immediately as starting
-  await addStudentRecord({ name, grade, score: 0, cpf });
+  try {
+    // Checa no banco de dados se o e-mail já realizou o teste
+    const allStudents = await fetchRankings();
+    if (allStudents && allStudents.some(s => s.cpf === email)) {
+      alert('Acesso Negado: Você já realizou este simulado! Só é permitida uma tentativa por aluno.');
+      return;
+    }
 
-  const summaryEl = document.getElementById('quiz-student-name');
-  if (summaryEl) summaryEl.textContent = name;
+    // Usamos o campo 'cpf' do banco de dados para armazenar o email sem precisar alterar a estrutura lá no Supabase
+    student = { name, grade, cpf: email };
+    currentQIdx = 0;
+    score = 0;
 
-  if (questionBank.length === 0) {
-    alert(`O banco de dados ainda não tem questões ativas cadastradas para esta categoria. Peça ao administrador para incluir questões!`);
-    return;
+    // FILTRA as questões APENAS para o Nível que o estudante selecionou E que estejam ATIVAS na prova
+    questionBank = questionBankAll.filter(q => (q.level === student.grade || !q.level) && Boolean(q.is_active));
+
+    // Register in database immediately as starting
+    await addStudentRecord({ name, grade, score: 0, cpf: email });
+
+    const summaryEl = document.getElementById('quiz-student-name');
+    if (summaryEl) summaryEl.textContent = name;
+
+    if (questionBank.length === 0) {
+      alert(`O banco de dados ainda não tem questões ativas cadastradas para esta categoria. Peça ao administrador para incluir questões!`);
+      return;
+    }
+  } finally {
+    btn.textContent = oldText;
+    btn.disabled = false;
   }
 
   showView(views.quiz);
@@ -351,6 +374,39 @@ async function finishQuiz() {
 
   showView(views.result);
 }
+
+// -----------------------------------------
+// 2.5. PUBLIC RANKING
+// -----------------------------------------
+document.getElementById('go-ranking-btn')?.addEventListener('click', async () => {
+  showView(views.ranking);
+  const tbody = document.getElementById('public-ranking-body');
+  const title = document.getElementById('ranking-grade-title');
+  if (title) title.textContent = `Categoria: ${student.grade}`;
+
+  if (tbody) {
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 2rem;">Carregando ranking oficial...</td></tr>';
+    let data = await fetchRankings();
+    if (data) {
+      data = data.filter(d => d.grade === student.grade).slice(0, 5); // Pega apenas os 5 melhores
+      tbody.innerHTML = '';
+      if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 2rem;">Nenhum resultado processado ainda.</td></tr>';
+        return;
+      }
+      data.forEach((s, idx) => {
+        const tr = document.createElement('tr');
+        let medal = idx === 0 ? '🥇 ' : idx === 1 ? '🥈 ' : idx === 2 ? '🥉 ' : '';
+        tr.innerHTML = `
+          <td style="font-weight:bold; font-size: 1.1rem; color: var(--color-primary);">${medal}${idx + 1}º</td>
+          <td style="font-weight:600;">${s.name}</td>
+          <td style="color:var(--color-success); font-weight:700;">${s.score} acertos</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  }
+});
 
 // -----------------------------------------
 // 3. ADMIN / TEACHER INTEGRATION
@@ -468,7 +524,7 @@ async function refreshAdminTable() {
       const d = s.created_at ? new Date(s.created_at).toLocaleDateString() : 'Hoje';
       tr.innerHTML = `
         <td>${idx + 1}</td>
-        <td style="font-weight:600;">${s.name}<br><span style="font-size:0.75rem; color:var(--color-text-muted); font-weight:normal;">CPF: ${s.cpf || 'Não informado'}</span></td>
+        <td style="font-weight:600;">${s.name}<br><span style="font-size:0.75rem; color:var(--color-text-muted); font-weight:normal;">E-mail: ${s.cpf || 'Não informado'}</span></td>
         <td><span style="background:#e2e8f0; color:#475569; padding:2px 8px; border-radius:12px; font-size:0.8rem;">${s.grade}</span></td>
         <td style="color:var(--color-success); font-weight:700;">${s.score} acertos</td>
         <td style="font-size:0.85rem; color:gray;">${d}</td>
