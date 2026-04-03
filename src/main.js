@@ -222,9 +222,10 @@ document.getElementById('student-form')?.addEventListener('submit', async (e) =>
   e.preventDefault();
   const name = document.getElementById('student-name').value.trim();
   const email = document.getElementById('student-email').value.trim().toLowerCase();
+  const cpf = document.getElementById('student-cpf')?.value.trim() || 'Não informado';
   const grade = document.getElementById('student-grade').value; // Isto capturará "Nível Júnior", etc.
 
-  if (!name || !grade || !email) return alert('Por favor, preencha todos os campos!');
+  if (!name || !grade || !email) return alert('Por favor, preencha todos os campos obrigatórios!');
 
   if (!email.includes('@escola')) {
     return alert('Acesso Negado: É obrigatório utilizar o seu e-mail institucional (@escola...) para realizar o simulado.');
@@ -238,13 +239,14 @@ document.getElementById('student-form')?.addEventListener('submit', async (e) =>
   try {
     // Checa no banco de dados se o e-mail já realizou o teste
     const allStudents = await fetchRankings();
-    if (allStudents && allStudents.some(s => s.cpf === email)) {
+    if (allStudents && allStudents.some(s => s.cpf && s.cpf.includes(email))) {
       alert('Acesso Negado: Você já realizou este simulado! Só é permitida uma tentativa por aluno.');
       return;
     }
 
-    // Usamos o campo 'cpf' do banco de dados para armazenar o email sem precisar alterar a estrutura lá no Supabase
-    student = { name, grade, cpf: email };
+    // Usamos o campo 'cpf' do banco de dados para armazenar o email e o CPF juntos
+    const combinedContact = cpf !== 'Não informado' ? `${email} (CPF: ${cpf})` : email;
+    student = { name, grade, cpf: combinedContact };
     currentQIdx = 0;
     score = 0;
 
@@ -258,7 +260,7 @@ document.getElementById('student-form')?.addEventListener('submit', async (e) =>
     }
 
     // Register in database immediately as starting
-    await addStudentRecord({ name, grade, score: 0, cpf: email });
+    await addStudentRecord({ name, grade, score: 0, cpf: combinedContact });
 
     const summaryEl = document.getElementById('quiz-student-name');
     if (summaryEl) summaryEl.textContent = name;
@@ -530,7 +532,7 @@ async function refreshAdminTable() {
       const d = s.created_at ? new Date(s.created_at).toLocaleDateString() : 'Hoje';
       tr.innerHTML = `
         <td>${idx + 1}</td>
-        <td style="font-weight:600;">${s.name}<br><span style="font-size:0.75rem; color:var(--color-text-muted); font-weight:normal;">E-mail: ${s.cpf || 'Não informado'}</span></td>
+        <td style="font-weight:600;">${s.name}<br><span style="font-size:0.75rem; color:var(--color-text-muted); font-weight:normal;">Contato: ${s.cpf || 'Não informado'}</span></td>
         <td><span style="background:#e2e8f0; color:#475569; padding:2px 8px; border-radius:12px; font-size:0.8rem;">${s.grade}</span></td>
         <td style="color:var(--color-success); font-weight:700;">${s.score} acertos</td>
         <td style="font-size:0.85rem; color:gray;">${d}</td>
