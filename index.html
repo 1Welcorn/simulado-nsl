@@ -300,16 +300,17 @@
 
     .option-label {
       display: flex;
-      align-items: center;
-      padding: 1.25rem 1.5rem;
+      align-items: flex-start;
+      padding: 2rem 2.5rem;
       border: 2px solid var(--color-border);
-      border-radius: var(--radius-md);
-      margin-bottom: 0.75rem;
+      border-radius: var(--radius-lg);
+      margin-bottom: 1.5rem;
       cursor: pointer;
       transition: var(--transition);
       background: white;
       font-weight: 500;
-      font-size: 1.15rem;
+      font-size: 2.3rem;
+      line-height: 1.4;
     }
 
     .option-label:hover {
@@ -318,9 +319,11 @@
     }
 
     .option-label input {
-      margin-right: 1rem;
-      transform: scale(1.2);
+      margin-right: 1.5rem;
+      transform: scale(2.5);
       accent-color: var(--color-accent);
+      flex-shrink: 0;
+      margin-top: 0.6rem;
     }
 
     /* View: Admin */
