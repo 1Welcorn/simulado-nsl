@@ -261,19 +261,24 @@ function renderQuestion() {
     }
   }
 
+  let imgContainer = document.getElementById('q-image-container');
   let imgEl = document.getElementById('q-image');
   if (q.image_url) {
-    if (!imgEl) {
+    if (imgEl) {
+      imgEl.src = q.image_url;
+    } else {
       imgEl = document.createElement('img');
       imgEl.id = 'q-image';
       imgEl.style.maxHeight = '300px';
       imgEl.style.marginBottom = '1rem';
       imgEl.style.borderRadius = '8px';
       if (titleEl) titleEl.parentNode.insertBefore(imgEl, titleEl.nextSibling);
+      imgEl.src = q.image_url;
     }
-    imgEl.src = q.image_url;
+    if (imgContainer) show(imgContainer);
     show(imgEl);
   } else {
+    if (imgContainer) hide(imgContainer);
     hide(imgEl);
   }
 
