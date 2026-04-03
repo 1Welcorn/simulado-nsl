@@ -77,8 +77,8 @@ window.updateSkillsDatalist = (level) => {
   dl.innerHTML = '';
 
   let validSkills = [];
-  if (showAll || level === 'Nível 3' || level === 'Nível Livre') {
-    // Nível 3, Livre, ou Toggle Ativado cobre todas as +30 skills
+  if (showAll || level === 'Nível 3') {
+    // Nível 3 ou Toggle Ativado cobre todas as +30 skills
     validSkills = [
       ...SKILLS_CONTENT["Nível Júnior"], ...SKILLS_CONTENT["Nível 1"],
       ...SKILLS_CONTENT["Nível 2"], ...SKILLS_CONTENT["Nível 3"]
@@ -657,7 +657,7 @@ document.getElementById('admin-bulk-btn')?.addEventListener('click', async () =>
       let qText = rawQ.text || rawQ.enunciado || '';
       if (rawQ.texto_base) qText = rawQ.texto_base + '\n\n' + qText;
 
-      let qLevel = rawQ.level || rawQ.nivel || 'Nível Livre';
+      let qLevel = rawQ.level || rawQ.nivel || 'Nível 3';
       let qImage = rawQ.image_url || rawQ.contexto_visual || rawQ.qImage || null;
       if (typeof qImage === 'string' && qImage.trim() === '') qImage = null; // AI recommendation fix
       let qDifficulty = rawQ.difficulty || rawQ.dificuldade || 'Média';
@@ -832,7 +832,7 @@ window.refreshQuestionBankList = () => {
         <div style="flex:1;">
           <strong title="Número organizado sequencialmente" style="cursor:help; padding-bottom: 0.1rem; margin-right: 0.5rem; font-size: 1rem; color: var(--color-primary);">Questão ${String(questionBankAll.findIndex(x => x.id === q.id) + 1).padStart(2, '0')}</strong> 
           <span title="ID real no banco de dados" style="font-size: 0.7rem; color: var(--color-text-muted); margin-right: 0.5rem;">(ID BD: ${q.id})</span>
-          <span style="font-size: 0.75rem; background: var(--color-bg); padding: 0.1rem 0.4rem; border-radius: 4px; border: 1px solid var(--color-border);">${q.level || 'Nível Livre'}</span>
+          <span style="font-size: 0.75rem; background: var(--color-bg); padding: 0.1rem 0.4rem; border-radius: 4px; border: 1px solid var(--color-border);">${q.level || 'Geral'}</span>
           <span style="font-size: 0.75rem; background: ${badgeColor}; color: white; padding: 0.1rem 0.4rem; border-radius: 4px; border: 1px solid transparent; margin-left: 0.25rem;">${q.difficulty || 'Média'}</span>
           <span style="font-size: 0.70rem; background: #f1f5f9; color: #334155; padding: 0.1rem 0.4rem; border-radius: 4px; border: 1px dashed #cbd5e1; margin-left: 0.25rem;">📌 ${q.theme || 'Temas Globais'}</span>
           ${q.source ? `<span style="font-size: 0.70rem; background: #fffbeb; color: #b45309; padding: 0.1rem 0.4rem; border-radius: 4px; border: 1px solid #fde68a; margin-left: 0.25rem;">🏛️ ${q.source}</span>` : ''}
@@ -949,8 +949,8 @@ window.editQuestion = (id) => {
   editingQuestionId = id;
 
   if (document.getElementById('admin-q-level')) {
-    document.getElementById('admin-q-level').value = q.level || 'Nível Livre';
-    window.updateSkillsDatalist(q.level || 'Nível Livre');
+    document.getElementById('admin-q-level').value = q.level || 'Nível 3';
+    window.updateSkillsDatalist(q.level || 'Nível 3');
   }
   if (document.getElementById('admin-q-diff')) document.getElementById('admin-q-diff').value = q.difficulty || 'Média';
   if (document.getElementById('admin-q-theme')) document.getElementById('admin-q-theme').value = q.theme || 'Temas Globais';
