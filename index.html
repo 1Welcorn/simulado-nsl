@@ -313,42 +313,55 @@
     .option-btn {
       display: flex;
       align-items: flex-start;
-      padding: 2rem 2.5rem;
+      padding: clamp(1.25rem, 2vw, 2.5rem);
       border: 2px solid var(--color-border);
       border-radius: var(--radius-lg);
       margin-bottom: 1.5rem;
       cursor: pointer;
-      transition: var(--transition);
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
       background: white;
       font-weight: 500;
-      font-size: 2.3rem;
+      font-size: clamp(1.2rem, 1.5vw + 0.8rem, 2.3rem);
       line-height: 1.4;
-      gap: 1.5rem;
+      gap: clamp(1rem, 2vw, 1.5rem);
+    }
+
+    #q-title {
+      font-size: clamp(1.6rem, 2.5vw + 1rem, 2.8rem);
+      line-height: 1.4;
+      margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+      font-weight: 700;
+      color: var(--color-primary);
     }
 
     .option-btn:hover {
       border-color: #cbd5e1;
       background: #f8fafc;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.1);
     }
 
     .option-btn.selected {
       border-color: var(--color-accent);
       background: #eff6ff;
+      transform: translateY(0);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
     }
 
     .option-letter {
-      width: 64px;
-      height: 64px;
+      width: clamp(44px, 5vw, 64px);
+      height: clamp(44px, 5vw, 64px);
       border-radius: 999px;
       background: #e2e8f0;
       border: 1px solid var(--color-border);
       display: grid;
       place-items: center;
-      font-size: 2rem;
+      font-size: clamp(1.2rem, 1.5vw + 0.5rem, 2rem);
       font-weight: 800;
       color: var(--color-text-muted);
       flex-shrink: 0;
-      margin-top: 0.35rem;
+      margin-top: 0.15rem;
+      transition: all 0.2s ease;
     }
 
     .option-btn.selected .option-letter {
@@ -540,7 +553,7 @@
         <span style="font-weight: 600; color: var(--color-text-muted);" id="quiz-student-name">Aluno</span>
       </div>
 
-      <h2 id="q-title" style="font-size: 2.8rem; line-height: 1.4; margin-bottom: 2rem;">Carregando pergunta...</h2>
+      <h2 id="q-title">Carregando pergunta...</h2>
       <div id="q-image-container" class="hidden"
         style="margin-top: 1.5rem; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--color-border); max-width: 100%; text-align: center; background: white;">
         <img id="q-image" src="" alt="Contexto da Pergunta"

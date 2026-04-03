@@ -497,43 +497,46 @@
     .option-btn {
       width: 100%;
       text-align: left;
-      min-height: 96px;
-      padding: 2rem 2.5rem;
+      min-height: 64px;
+      padding: clamp(1.25rem, 2vw, 2.5rem);
       border-radius: var(--radius-lg);
       border: 1px solid var(--color-divider);
       background: white;
       display: flex;
-      gap: 2rem;
+      gap: clamp(1rem, 2vw, 2rem);
       align-items: flex-start;
-      font-size: 2.4rem;
+      font-size: clamp(1.2rem, 1.5vw + 0.8rem, 2.4rem);
       line-height: 1.5;
-      transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+      transition: transform 0.2s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
     }
 
     .option-btn:hover {
       border-color: var(--color-primary);
-      box-shadow: 0 0 0 4px rgba(1, 105, 111, .08);
+      box-shadow: 0 6px 20px -6px rgba(1, 105, 111, .15);
+      transform: translateY(-2px);
     }
 
     .option-btn.selected {
       border-color: var(--color-primary);
       background: #f0f8f8;
       box-shadow: 0 0 0 4px rgba(1, 105, 111, .10);
+      transform: translateY(0);
     }
 
     .option-letter {
-      width: 64px;
-      height: 64px;
+      width: clamp(44px, 5vw, 64px);
+      height: clamp(44px, 5vw, 64px);
       border-radius: 999px;
       background: var(--color-surface-2);
       border: 1px solid var(--color-divider);
       display: grid;
       place-items: center;
-      font-size: var(--text-xl);
+      font-size: clamp(1.2rem, 1.5vw + 0.5rem, 2rem);
       font-weight: 800;
       color: var(--color-text-muted);
       flex-shrink: 0;
-      margin-top: 0.35rem;
+      margin-top: 0.15rem;
+      transition: all 0.2s ease;
     }
 
     .option-btn.selected .option-letter {
