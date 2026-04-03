@@ -117,6 +117,17 @@ const showView = (view) => {
 const show = (el) => el && el.classList.remove('hidden');
 const hide = (el) => el && el.classList.add('hidden');
 
+// Image Lightbox Logic
+window.openImageModal = (src) => {
+  const modal = document.getElementById('image-modal');
+  const modalImg = document.getElementById('image-modal-img');
+  if (modal && modalImg) {
+    modalImg.src = src;
+    show(modal);
+  }
+};
+document.getElementById('image-modal')?.addEventListener('click', (e) => hide(e.currentTarget));
+
 // Initialization
 async function initApp() {
   // Inicializa a Datalist de Conteúdos/Skills dinamicamente com base no Nível
@@ -272,9 +283,12 @@ function renderQuestion() {
       imgEl.style.maxHeight = '300px';
       imgEl.style.marginBottom = '1rem';
       imgEl.style.borderRadius = '8px';
+      imgEl.style.cursor = 'zoom-in';
+      imgEl.title = 'Clique para ampliar';
       if (titleEl) titleEl.parentNode.insertBefore(imgEl, titleEl.nextSibling);
       imgEl.src = q.image_url;
     }
+    imgEl.onclick = () => window.openImageModal(q.image_url);
     if (imgContainer) show(imgContainer);
     show(imgEl);
   } else {
@@ -781,7 +795,7 @@ window.refreshQuestionBankList = () => {
         
         ${q.image_url ? `
         <div style="margin-top: 1.5rem; margin-bottom: 1.5rem; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--color-border); max-width: 100%; text-align: center; background: white;">
-             <img src="${q.image_url}" alt="Contexto da Pergunta" style="max-height: 400px; width: auto; max-width: 100%; display: inline-block; padding: 0.5rem;" />
+             <img src="${q.image_url}" alt="Contexto da Pergunta" title="Clique para ampliar" style="max-height: 400px; width: auto; max-width: 100%; display: inline-block; padding: 0.5rem; cursor: zoom-in;" onclick="window.openImageModal('${q.image_url}')" />
         </div>` : ''}
         
         <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem;">
