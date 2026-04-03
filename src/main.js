@@ -239,7 +239,8 @@ document.getElementById('student-form')?.addEventListener('submit', async (e) =>
   try {
     // Checa no banco de dados se o e-mail já realizou o teste
     const allStudents = await fetchRankings();
-    if (allStudents && allStudents.some(s => s.cpf && s.cpf.includes(email))) {
+    // Busca o email exato ou o email com CPF concatenado, evitando que 'ana@' bloqueie 'juliana@'
+    if (allStudents && allStudents.some(s => s.cpf && (s.cpf === email || s.cpf.startsWith(`${email} (CPF:`)))) {
       alert('Acesso Negado: Você já realizou este simulado! Só é permitida uma tentativa por aluno.');
       return;
     }
@@ -374,7 +375,7 @@ async function finishQuiz() {
 
   // Update final score in Supabase
   try {
-    await supabase.from('students').upsert({ name: student.name, grade: student.grade, score: score, cpf: student.cpf });
+    await supabase.from('students').update({ score: score }).eq('cpf', student.cpf);
   } catch (e) { console.error(e); }
 
   const scoreEl = document.getElementById('result-score-number');
