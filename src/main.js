@@ -196,7 +196,7 @@ async function initApp() {
     // Update Topbar
     navBtns.userInfo.textContent = `👤 ${currentUser.email}`;
     show(navBtns.userInfo);
-    navBtns.admin.textContent = 'Painel (Logado)';
+    navBtns.admin.textContent = 'ADMIN';
   }
 
   // Load Quiz Questions
@@ -460,6 +460,10 @@ async function loadAdminDashboard() {
   showView(views.admin);
   show(navBtns.home);
 
+  // Signalling Admin Mode with Green Color
+  navBtns.admin.classList.remove('btn-primary');
+  navBtns.admin.classList.add('btn-success');
+
   await refreshAdminTable();
   if (role === 'master') {
     refreshQuestionBankList();
@@ -504,6 +508,10 @@ navBtns.home?.addEventListener('click', () => {
   location.hash = '';
   hide(navBtns.home);
   showView(views.gate);
+  
+  // Reset Admin Button to Native Color
+  navBtns.admin.classList.remove('btn-success');
+  navBtns.admin.classList.add('btn-primary');
 });
 
 // Admin Filter Logic
