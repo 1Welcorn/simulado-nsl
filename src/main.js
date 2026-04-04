@@ -768,6 +768,38 @@ document.getElementById('admin-nuke-btn')?.addEventListener('click', async () =>
   }
 });
 
+// Botão Explorador: Ajustar Espaçamentos em massa
+document.getElementById('admin-fix-spacing-btn')?.addEventListener('click', async () => {
+    if (!confirm('Deseja varrer todas as questões e garantir que os parágrafos tenham uma linha em branco entre eles? Isso corrigirá o problema de textos "grudados".')) return;
+    
+    const btn = document.getElementById('admin-fix-spacing-btn');
+    const oldText = btn.textContent;
+    btn.textContent = 'Ajustando...';
+    btn.disabled = true;
+
+    try {
+        let count = 0;
+        for (const q of questionBankAll) {
+            const originalText = q.text || '';
+            // Substitui quebras simples por duplas (se for apenas uma e não houver outra perto)
+            const newText = originalText.replace(/([^\n])\n([^\n])/g, '$1\n\n$2');
+            
+            if (newText !== originalText) {
+                await updateQuestion(q.id, { text: newText });
+                q.text = newText;
+                count++;
+            }
+        }
+        alert(`Sucesso! ${count} questões foram ajustadas com novos espaçamentos.`);
+        window.refreshQuestionBankList();
+    } catch (e) {
+        alert('Erro ao processar: ' + e.message);
+    } finally {
+        btn.textContent = oldText;
+        btn.disabled = false;
+    }
+});
+
 window.filterFromSummary = (level, difficulty) => {
   // Limpar todos os filtros primeiro
   document.querySelectorAll('.q-filter').forEach(cb => cb.checked = false);

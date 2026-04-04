@@ -867,9 +867,10 @@
               style="font-family: monospace; font-size: 0.85rem; background: #1e293b; color: #f8fafc;"
               placeholder='[ { "level": "Nível 1", "source": "ENEM", "text": "Qual a capital?", "options": ["X","Y","W","Z"], "answer": 0 } ]'></textarea>
 
-            <div style="display:flex; gap:1rem; margin-top: 1rem;">
-              <button id="admin-bulk-btn" class="btn btn-primary" style="flex:2;">⬇️ Processar JSON</button>
-              <button id="admin-nuke-btn" class="btn btn-danger" style="flex:1;">💣 Zerar Banco</button>
+            <div style="display:flex; gap:1rem; margin-top: 1rem; flex-wrap: wrap;">
+              <button id="admin-bulk-btn" class="btn btn-primary" style="flex:2; min-width: 150px;">⬇️ Processar JSON</button>
+              <button id="admin-fix-spacing-btn" class="btn btn-secondary" style="flex:1; min-width: 150px;" title="Adiciona uma linha em branco automática entre parágrafos grudados">🧹 Ajustar Espaços</button>
+              <button id="admin-nuke-btn" class="btn btn-danger" style="flex:1; min-width: 150px;">💣 Zerar Banco</button>
             </div>
           </div>
 
