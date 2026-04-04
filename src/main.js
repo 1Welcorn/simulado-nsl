@@ -297,10 +297,18 @@ function renderQuestion() {
 
   const titleEl = document.getElementById('q-title');
   if (titleEl) {
+    titleEl.textContent = q.text;
+  }
+
+  // Novo Campo: Fonte / Créditos (Dinâmico)
+  const sourceContainer = document.getElementById('q-source-container');
+  const sourceText = document.getElementById('q-source-text');
+  if (sourceContainer && sourceText) {
     if (q.source) {
-      titleEl.innerHTML = `<span style="font-size: 0.85rem; font-weight: 500; color: var(--color-primary); display:block; margin-bottom: 0.8rem; background: #e0e7ff; padding: 0.2rem 0.6rem; border-radius: 4px; border: 1px dashed #a5b4fc; width: fit-content;">🏛️ Fonte: ${q.source}</span>${q.text}`;
+      sourceText.textContent = `🏙️ Créditos/Fonte: ${q.source}`;
+      show(sourceContainer);
     } else {
-      titleEl.textContent = q.text;
+      hide(sourceContainer);
     }
   }
 
@@ -896,12 +904,14 @@ window.refreshQuestionBankList = () => {
         
         <div style="text-align:center; margin-bottom: 1rem;"><span style="background:var(--color-bg); padding: 0.2rem 1rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; border: 1px solid var(--color-border); color: var(--color-text);">👀 VISÃO DO ALUNO</span></div>
         
-        <h2 style="font-size: clamp(1.2rem, 1.5vw + 0.5rem, 1.8rem); line-height: 1.3; margin-bottom: 1rem; color: var(--color-text); white-space: pre-wrap;">${q.source ? `<span style="font-size: 0.85rem; font-weight: 500; color: var(--color-primary); display:block; margin-bottom: 0.8rem; background: #e0e7ff; padding: 0.2rem 0.6rem; border-radius: 4px; border: 1px dashed #a5b4fc; width: fit-content;">🏛️ Fonte: ${q.source}</span>` : ''}${q.text}</h2>
+        <h2 style="font-size: clamp(1.2rem, 1.5vw + 0.5rem, 1.8rem); line-height: 1.3; margin-bottom: 1rem; color: var(--color-text); white-space: pre-wrap;">${q.text}</h2>
         
         ${q.image_url ? `
-        <div style="margin-top: 1.5rem; margin-bottom: 1.5rem; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--color-border); max-width: 100%; text-align: center; background: white;">
+        <div style="margin-top: 1.5rem; margin-bottom: 0.5rem; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--color-border); max-width: 100%; text-align: center; background: white;">
              <img src="${q.image_url}" alt="Contexto da Pergunta" title="Clique para ampliar" style="max-height: 400px; width: auto; max-width: 100%; display: inline-block; padding: 0.5rem; cursor: zoom-in;" onclick="window.openImageModal('${q.image_url}')" />
         </div>` : ''}
+
+        ${q.source ? `<div style="font-size: 0.75rem; color: var(--color-text-muted); font-style: italic; margin-bottom: 1rem; opacity: 0.8;">🏙️ Créditos/Fonte: ${q.source}</div>` : ''}
         
         <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem;">
           ${(q.options || []).map((opt, idx) => {
