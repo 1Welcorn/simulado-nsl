@@ -297,15 +297,19 @@ function renderQuestion() {
 
   const titleEl = document.getElementById('q-title');
   if (titleEl) {
-    titleEl.textContent = q.text;
+    if (q.source) {
+      titleEl.innerHTML = `<span style="font-size: 0.85rem; font-weight: 500; color: var(--color-primary); display:block; margin-bottom: 0.8rem; background: #e0e7ff; padding: 0.2rem 0.6rem; border-radius: 4px; border: 1px dashed #a5b4fc; width: fit-content;">🏛️ Origem: ${q.source}</span>${q.text}`;
+    } else {
+      titleEl.textContent = q.text;
+    }
   }
 
-  // Novo Campo: Fonte / Créditos (Dinâmico)
+  // Novo Campo: Créditos / Referência (Dinâmico e Menor)
   const sourceContainer = document.getElementById('q-source-container');
   const sourceText = document.getElementById('q-source-text');
   if (sourceContainer && sourceText) {
-    if (q.source) {
-      sourceText.textContent = `🏙️ Créditos/Fonte: ${q.source}`;
+    if (q.credits) {
+      sourceText.textContent = `🏙️ Ref/Créditos: ${q.credits}`;
       show(sourceContainer);
     } else {
       hide(sourceContainer);
@@ -581,6 +585,7 @@ document.getElementById('admin-save-q-btn')?.addEventListener('click', async () 
   const difficulty = document.getElementById('admin-q-diff').value;
   const theme = document.getElementById('admin-q-theme').value || 'Temas Globais';
   const source = document.getElementById('admin-q-source')?.value.trim() || '';
+  const credits = document.getElementById('admin-q-credits')?.value.trim() || '';
   const skills = document.getElementById('admin-q-skill')?.value.trim() || '';
   const text = document.getElementById('admin-q-text').value.trim();
   let imageUrl = document.getElementById('admin-q-image').value.trim();
@@ -612,7 +617,7 @@ document.getElementById('admin-save-q-btn')?.addEventListener('click', async () 
     let finalOptions = [opt0, opt1, opt2, opt3];
     if (opt4) finalOptions.push(opt4);
 
-    const newQ = { level, difficulty, theme, source: source || null, skills: skills || null, is_active: _is_active, text, options: finalOptions, answer, image_url: imageUrl || null };
+    const newQ = { level, difficulty, theme, source: source || null, credits: credits || null, skills: skills || null, is_active: _is_active, text, options: finalOptions, answer, image_url: imageUrl || null };
 
     if (editingQuestionId) {
       await updateQuestion(editingQuestionId, newQ);
@@ -627,6 +632,8 @@ document.getElementById('admin-save-q-btn')?.addEventListener('click', async () 
     }
 
     // Clean inputs
+    document.getElementById('admin-q-source').value = '';
+    document.getElementById('admin-q-credits').value = '';
     document.getElementById('admin-q-text').value = '';
     document.getElementById('admin-q-image').value = '';
     document.getElementById('admin-q-file').value = '';
@@ -679,6 +686,7 @@ document.getElementById('admin-bulk-btn')?.addEventListener('click', async () =>
       let qDifficulty = rawQ.difficulty || rawQ.dificuldade || 'Média';
       let qTheme = rawQ.theme || rawQ.tema || 'Temas Globais';
       let qSource = rawQ.source || rawQ.fonte || rawQ.banca || rawQ.vestibular || rawQ.ano || null;
+      let qCredits = rawQ.credits || rawQ.creditos || rawQ.referencia || rawQ.copyright || null;
       let qSkills = rawQ.skills || rawQ.skill || rawQ.habilidade || rawQ.habilidade_especifica || rawQ.conteudo || rawQ.conteudos || rawQ.assunto || null;
 
       let qOptions = rawQ.options;
@@ -716,6 +724,7 @@ document.getElementById('admin-bulk-btn')?.addEventListener('click', async () =>
           difficulty: qDifficulty,
           theme: qTheme,
           source: qSource,
+          credits: qCredits,
           skills: qSkills,
           is_active: false,
           text: qText,
@@ -904,14 +913,14 @@ window.refreshQuestionBankList = () => {
         
         <div style="text-align:center; margin-bottom: 1rem;"><span style="background:var(--color-bg); padding: 0.2rem 1rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; border: 1px solid var(--color-border); color: var(--color-text);">👀 VISÃO DO ALUNO</span></div>
         
-        <h2 style="font-size: clamp(1.2rem, 1.5vw + 0.5rem, 1.8rem); line-height: 1.3; margin-bottom: 1rem; color: var(--color-text); white-space: pre-wrap;">${q.text}</h2>
+        <h2 style="font-size: clamp(1.2rem, 1.5vw + 0.5rem, 1.8rem); line-height: 1.3; margin-bottom: 1rem; color: var(--color-text); white-space: pre-wrap;">${q.source ? `<span style="font-size: 0.85rem; font-weight: 500; color: var(--color-primary); display:block; margin-bottom: 0.8rem; background: #e0e7ff; padding: 0.2rem 0.6rem; border-radius: 4px; border: 1px dashed #a5b4fc; width: fit-content;">🏛️ Origem: ${q.source}</span>` : ''}${q.text}</h2>
         
         ${q.image_url ? `
         <div style="margin-top: 1.5rem; margin-bottom: 0.5rem; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--color-border); max-width: 100%; text-align: center; background: white;">
              <img src="${q.image_url}" alt="Contexto da Pergunta" title="Clique para ampliar" style="max-height: 400px; width: auto; max-width: 100%; display: inline-block; padding: 0.5rem; cursor: zoom-in;" onclick="window.openImageModal('${q.image_url}')" />
         </div>` : ''}
 
-        ${q.source ? `<div style="font-size: 0.75rem; color: var(--color-text-muted); font-style: italic; margin-bottom: 1rem; opacity: 0.8;">🏙️ Créditos/Fonte: ${q.source}</div>` : ''}
+        ${q.credits ? `<div style="font-size: 0.75rem; color: var(--color-text-muted); font-style: italic; margin-bottom: 1rem; opacity: 0.8;">🏙️ Ref/Créditos: ${q.credits}</div>` : ''}
         
         <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem;">
           ${(q.options || []).map((opt, idx) => {
@@ -1005,6 +1014,7 @@ window.editQuestion = (id) => {
   if (document.getElementById('admin-q-diff')) document.getElementById('admin-q-diff').value = q.difficulty || 'Média';
   if (document.getElementById('admin-q-theme')) document.getElementById('admin-q-theme').value = q.theme || 'Temas Globais';
   if (document.getElementById('admin-q-source')) document.getElementById('admin-q-source').value = q.source || '';
+  if (document.getElementById('admin-q-credits')) document.getElementById('admin-q-credits').value = q.credits || '';
   if (document.getElementById('admin-q-skill')) document.getElementById('admin-q-skill').value = q.skills || '';
 
   document.getElementById('admin-q-text').value = q.text || '';
