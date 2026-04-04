@@ -770,9 +770,10 @@
 
       <!-- Tab Content: Question Bank (Only Master Admin) -->
       <section id="admin-pnl-questions" class="hidden">
-        <div class="grid-2">
+        <div style="display: flex; gap: 2rem; align-items: flex-start; flex-wrap: wrap; width: 100%;">
 
-          <div class="glass-card" style="max-width: 100%;">
+          <!-- Coluna 1: Formulário (Limitado a 620px para caber em telas 1280px) -->
+          <div class="glass-card" style="flex: 1; min-width: 320px; max-width: 620px;">
             <h3>Nova Questão</h3>
 
             <div class="grid-2">
@@ -805,6 +806,7 @@
                   <option value="Contextos Específicos">Contextos Específicos</option>
                 </select>
               </div>
+            </div> <!-- Closes the row started at line 797 -->
             <div class="grid-2">
               <div class="form-group">
                 <label>Origem (Vestibular / Ano / Simulado)</label>
@@ -885,7 +887,8 @@
             </div>
           </div>
 
-          <div>
+          <!-- Coluna 2: Lista de Questões (Flexível para ocupar o resto) -->
+          <div style="flex: 1.5; min-width: 320px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
               <h3 style="display:flex; align-items:center; gap:0.5rem;">Banco Atual <span id="bank-total-count"
                   style="font-size: 1rem; color: var(--color-text-muted); font-weight: normal;">(0 questões)</span></h3>
