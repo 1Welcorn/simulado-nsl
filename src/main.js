@@ -178,55 +178,76 @@ async function initApp() {
   // Carrega a lista de professores autorizados do Supabase antes de decidir permissões
   await loadTeachersFromDB();
 
-  if (currentUser) {
+  // Monitora mudanças de URL (hash) para garantir segurança e navegação
+  window.addEventListener('hashchange', checkRoutePermissions);
+
+  await checkRoutePermissions();
+}
+
+/**
+ * SECURITY GUARD: Verifica permissões de rota em tempo real
+ */
+async function checkRoutePermissions() {
+  const hash = location.hash;
+  const isProtected = hash.startsWith('#admin');
+  
+  if (isProtected) {
+    currentUser = await getUser();
+    if (!currentUser) {
+      // Se não está logado e tenta entrar no admin, redireciona pro início
+      location.hash = '';
+      showView(views.gate);
+      return;
+    }
+
     const isMaster = currentUser.email === MASTER_EMAIL || currentUser.email === 'COLOQUE_AQUI_SEU_GMAIL_QUE_LOGOU';
     const isTeacher = authorizedTeachers.includes(currentUser.email.toLowerCase());
 
     if (isMaster) {
       role = 'master';
-      if (document.getElementById('role-badge')) {
-        document.getElementById('role-badge').textContent = 'Admin. Principal';
-        document.getElementById('role-badge').className = 'badge badge-master';
-      }
-      show(document.getElementById('tab-questions')); // Master can edit bank
-      show(document.getElementById('tab-teachers')); // Master can see teachers
+      updateRoleBadge('Admin. Principal', 'badge badge-master');
+      show(document.getElementById('tab-questions'));
+      show(document.getElementById('tab-teachers'));
     } else if (isTeacher) {
       role = 'teacher';
-      if (document.getElementById('role-badge')) {
-        document.getElementById('role-badge').textContent = 'Professor (Acesso Comum)';
-        document.getElementById('role-badge').className = 'badge badge-teacher';
-      }
+      updateRoleBadge('Professor (Acesso Comum)', 'badge badge-teacher');
       hide(document.getElementById('tab-questions'));
       hide(document.getElementById('tab-teachers'));
     } else {
-      // Usuário logado mas NÃO é mestre nem professor autorizado
-      alert(`Acesso Negado: O e-mail ${currentUser.email} não tem autorização para o painel administrativo. Entre em contato com o Administrador Principal.`);
+      // TENTATIVA DE INVASÃO: E-mail institucional ou qualquer outro sem cadastro no 'teachers'
+      console.warn(`[SEGURANÇA] Bloqueado acesso não autorizado de: ${currentUser.email}`);
+      alert(`⚠️ ACESSO PROIBIDO: O e-mail ${currentUser.email} não possui credenciais de Administrador ou Professor.\n\nSua sessão foi encerrada por motivos de segurança.`);
+      
+      // Expulsão imediata
       await signOut();
       currentUser = null;
       role = 'student';
       location.hash = '';
+      location.reload(); // Hard reset para limpar qualquer dado residual na memória
       return;
     }
 
-    // Update Topbar
+    // Se chegou aqui, está autorizado
     navBtns.userInfo.textContent = `👤 ${currentUser.email}`;
     show(navBtns.userInfo);
     navBtns.admin.textContent = 'ADMIN';
-  }
-
-  // Load Quiz Questions
-  const data = await fetchQuestions();
-  if (data && data.length > 0) {
-    questionBankAll = data;
-  } else {
-    questionBankAll = [];
-  }
-
-  // If they came with #admin in the URL, OR just returned from OAuth redirect (access_token in hash)
-  const isOAuthCallback = location.hash.includes('access_token') || location.hash.includes('type=recovery');
-  if (currentUser && (location.hash === '#admin' || isOAuthCallback)) {
-    location.hash = '#admin';
     await loadAdminDashboard();
+  } else {
+    // Rota pública (Início)
+    if (hash === '' || hash === '#') {
+      showView(views.gate);
+      hide(navBtns.home);
+      navBtns.admin.classList.remove('btn-success');
+      navBtns.admin.classList.add('btn-primary');
+    }
+  }
+}
+
+function updateRoleBadge(text, className) {
+  const badge = document.getElementById('role-badge');
+  if (badge) {
+    badge.textContent = text;
+    badge.className = className;
   }
 }
 
