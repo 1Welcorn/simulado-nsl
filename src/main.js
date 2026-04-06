@@ -181,6 +181,14 @@ async function initApp() {
   // Monitora mudanças de URL (hash) para garantir segurança e navegação
   window.addEventListener('hashchange', checkRoutePermissions);
 
+  // CARREGAR QUESTÕES DO SIMULADO (Essencial para o aluno iniciar o teste)
+  const data = await fetchQuestions();
+  if (data && data.length > 0) {
+    questionBankAll = data;
+  } else {
+    questionBankAll = [];
+  }
+
   await checkRoutePermissions();
 }
 
