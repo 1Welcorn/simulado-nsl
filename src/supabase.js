@@ -86,13 +86,34 @@ export async function uploadImage(fileObj) {
   return data.publicUrl;
 }
 export const fetchRankings = async () => {
-  const { data, error } = await supabase.from('students').select('*').order('score', { ascending: false });
+  // Primero ordenamos por desclassificado (false < true) e depois por nota descendente
+  const { data, error } = await supabase
+    .from('students')
+    .select('*')
+    .order('disqualified', { ascending: true })
+    .order('score', { ascending: false });
   if (error) console.error('Error fetching rankings:', error);
   return data;
 };
 
 export async function addStudentRecord({ name, grade, score, cpf }) {
-  const { data, error } = await supabase.from('students').insert([{ name, grade, score, cpf }]);
+  const { data, error } = await supabase.from('students').insert([{ name, grade, score, cpf, disqualified: false }]);
   if (error) console.error('Erro ao adicionar aluno:', error);
+  return data;
+}
+
+export async function disqualifyStudent(id, reason, teacherEmail) {
+  const { data, error } = await supabase
+    .from('students')
+    .update({ 
+      disqualified: true, 
+      disqualification_reason: reason,
+      disqualified_by: teacherEmail 
+    })
+    .eq('id', id);
+  if (error) {
+    console.error('Erro ao desclassificar aluno:', error);
+    throw error;
+  }
   return data;
 }

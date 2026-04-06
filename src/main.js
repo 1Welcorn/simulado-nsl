@@ -1,6 +1,6 @@
 import {
   supabase, fetchQuestions, addStudentRecord, fetchRankings, addQuestion, uploadImage, updateQuestion, deleteQuestion,
-  signInWithGoogle, signOut, getUser
+  signInWithGoogle, signOut, getUser, disqualifyStudent
 } from './supabase.js';
 
 // DOM Elements
@@ -418,11 +418,23 @@ document.getElementById('go-ranking-btn')?.addEventListener('click', async () =>
       data.forEach((s, idx) => {
         const tr = document.createElement('tr');
         let medal = idx === 0 ? '🥇 ' : idx === 1 ? '🥈 ' : idx === 2 ? '🥉 ' : '';
-        tr.innerHTML = `
-          <td style="font-weight:bold; font-size: 1.1rem; color: var(--color-primary);">${medal}${idx + 1}º</td>
-          <td style="font-weight:600;">${s.name}</td>
-          <td style="color:var(--color-success); font-weight:700;">${s.score} acertos</td>
-        `;
+        
+        // Se desclassificado, aplicar estilo visual diferente
+        if (s.disqualified) {
+          tr.style.opacity = '0.6';
+          tr.style.background = '#fff1f2';
+          tr.innerHTML = `
+            <td style="font-weight:bold; font-size: 1.1rem; color: var(--color-danger);">OUT</td>
+            <td style="font-weight:600; text-decoration: line-through;">${s.name} <br><span style="font-size:0.7rem; color:red; font-style:italic;">Desclassificado: ${s.disqualification_reason || 'Fraude'}</span></td>
+            <td style="color:var(--color-danger); font-weight:700;">Zero</td>
+          `;
+        } else {
+          tr.innerHTML = `
+            <td style="font-weight:bold; font-size: 1.1rem; color: var(--color-primary);">${medal}${idx + 1}º</td>
+            <td style="font-weight:600;">${s.name}</td>
+            <td style="color:var(--color-success); font-weight:700;">${s.score} acertos</td>
+          `;
+        }
         tbody.appendChild(tr);
       });
     }
@@ -527,12 +539,10 @@ navBtns.home?.addEventListener('click', () => {
 });
 
 // Admin Filter Logic
-document.getElementById('admin-filter-grade')?.addEventListener('change', refreshAdminTable);
-
 async function refreshAdminTable() {
   const tbody = document.getElementById('admin-table-body');
   if (!tbody) return;
-  tbody.innerHTML = '<tr><td colspan="5">Carregando dados da nuvem...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="6">Carregando dados da nuvem...</td></tr>';
 
   let data = await fetchRankings();
   const filter = document.getElementById('admin-filter-grade')?.value || 'all';
@@ -544,27 +554,53 @@ async function refreshAdminTable() {
 
     tbody.innerHTML = '';
     if (data.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5">Nenhum aluno encontado para esta turma.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6">Nenhum aluno encontado para esta turma.</td></tr>';
       return;
     }
 
     data.forEach((s, idx) => {
       const tr = document.createElement('tr');
       const d = s.created_at ? new Date(s.created_at).toLocaleDateString() : 'Hoje';
+      
+      const isDisqualified = s.disqualified === true;
+      const scoreDisplay = isDisqualified 
+        ? `<span style="color:var(--color-danger); font-weight:800;">[DESCLASSIFICADO]</span><br><span style="font-size:0.7rem; color:gray;">Motivo: ${s.disqualification_reason || '-'}</span><br><span style="font-size:0.6rem; color:blue;">Por: ${s.disqualified_by || 'Admin'}</span>`
+        : `<span style="color:var(--color-success); font-weight:700;">${s.score} acertos</span>`;
+
       tr.innerHTML = `
         <td>${idx + 1}</td>
-        <td style="font-weight:600;">${s.name}<br><span style="font-size:0.75rem; color:var(--color-text-muted); font-weight:normal;">Contato: ${s.cpf || 'Não informado'}</span></td>
+        <td style="font-weight:600; ${isDisqualified ? 'text-decoration: line-through; opacity: 0.7;' : ''}">${s.name}<br><span style="font-size:0.75rem; color:var(--color-text-muted); font-weight:normal;">Contato: ${s.cpf || 'Não informado'}</span></td>
         <td><span style="background:#e2e8f0; color:#475569; padding:2px 8px; border-radius:12px; font-size:0.8rem;">${s.grade}</span></td>
-        <td style="color:var(--color-success); font-weight:700;">${s.score} acertos</td>
+        <td>${scoreDisplay}</td>
         <td style="font-size:0.85rem; color:gray;">${d}</td>
         <td>
-          <button class="btn btn-danger" style="padding:0.3rem 0.6rem; font-size:0.75rem;" onclick="window.deleteStudentResult('${s.id}')">Apagar</button>
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            ${!isDisqualified ? `<button class="btn btn-secondary" style="padding:0.3rem 0.6rem; font-size:0.75rem; border-color:var(--color-danger); color:var(--color-danger);" onclick="window.handleDisqualify('${s.id}', '${s.name}')">Desclassificar</button>` : ''}
+            <button class="btn btn-danger" style="padding:0.3rem 0.6rem; font-size:0.75rem;" onclick="window.deleteStudentResult('${s.id}')">Apagar</button>
+          </div>
         </td>
       `;
       tbody.appendChild(tr);
     });
   }
 }
+
+window.handleDisqualify = async (id, name) => {
+  const reason = prompt(`Motivo da desclassificação para ${name}:\n(Ex: Uso de Google Tradutor, Lens, Consulta externa, etc.)`);
+  if (reason === null) return; // Cancelou
+  
+  const finalReason = reason.trim() || "Trapaça / Violação dos termos";
+  if (confirm(`Confirmar desclassificação de ${name}?\nMotivo: ${finalReason}\n\nO aluno irá automaticamente para o fim da lista.`)) {
+    try {
+      const teacherEmail = currentUser ? currentUser.email : 'Admin Desconhecido';
+      await disqualifyStudent(id, finalReason, teacherEmail);
+      alert('Aluno desclassificado com sucesso!');
+      refreshAdminTable();
+    } catch (err) {
+      alert('Erro ao desclassificar: ' + err.message);
+    }
+  }
+};
 
 window.deleteStudentResult = async (id) => {
   if (confirm('Tem certeza absoluta que deseja apagar o resultado desse aluno da sua escola? A ação é irreversível.')) {
