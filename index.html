@@ -764,9 +764,42 @@
               </select>
             </div>
 
-            <button onclick="window.print()" class="btn btn-secondary" style="white-space: nowrap;">
-              🖨️ Imprimir Resultados
-            </button>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <button onclick="window.print()" class="btn btn-secondary" style="white-space: nowrap;">
+                🖨️ Imprimir Resultados
+              </button>
+              <button id="toggle-cleanup-btn" class="btn btn-secondary" style="white-space: nowrap; border-color: var(--color-danger); color: var(--color-danger);">
+                🧹 Expulsar Alunos (Limpeza)
+              </button>
+            </div>
+          </div>
+
+          <!-- Cleanup Tool (Hidden by Default) -->
+          <div id="cleanup-tool-wrapper" class="hidden" style="margin-top: 2rem; padding-top: 2rem; border-top: 1px dashed var(--color-border);">
+            <h3>🛡️ Limpeza de Base e Expulsão</h3>
+            <p>Remova permanentemente alunos que não estão nesta lista oficial ou que usaram e-mails errados.</p>
+            
+            <div style="display:grid; gap:1.5rem; grid-template-columns: 1fr 1fr; margin-top:1rem;">
+              <div>
+                <label>Lista de E-mails Autorizados (um por linha)</label>
+                <textarea id="cleanup-authorized-list" class="input-field" style="height: 150px; font-family: monospace; font-size: 0.85rem;" placeholder="aluno1@escola.pr.gov.br&#10;aluno2@escola.pr.gov.br"></textarea>
+                <button id="run-cleanup-list-btn" class="btn btn-danger" style="width:100%; margin-top:0.5rem; background: var(--color-danger); color:white;">
+                  Expulsar por Lista de Whitelist
+                </button>
+              </div>
+              <div>
+                <label>Filtros Rápidos de Auditoria</label>
+                <div style="display:grid; gap:0.5rem;">
+                  <button id="cleanup-domain-btn" class="btn btn-secondary" style="justify-content: flex-start; text-align: left; font-size: 0.85rem;">
+                    🎯 Identificar e-mails NÃO-institucionais (@escola)
+                  </button>
+                  <button id="cleanup-duplicate-btn" class="btn btn-secondary" style="justify-content: flex-start; text-align: left; font-size: 0.85rem;">
+                    👯 Identificar Alunos com nome/email duplicado
+                  </button>
+                  <p class="help">Estes botões apenas <strong>selecionam</strong> os alunos na tabela abaixo para conferência antes de apagar.</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

@@ -175,9 +175,14 @@ async function initApp() {
   // Check if someone is logged in
   currentUser = await getUser();
 
+  // Carrega a lista de professores autorizados do Supabase antes de decidir permissões
+  await loadTeachersFromDB();
+
   if (currentUser) {
-    // ATENÇÃO: Se você fez login com outro e-mail (como seu Gmail pessoal), coloque ele aqui!
-    if (currentUser.email === MASTER_EMAIL || currentUser.email === 'COLOQUE_AQUI_SEU_GMAIL_QUE_LOGOU') {
+    const isMaster = currentUser.email === MASTER_EMAIL || currentUser.email === 'COLOQUE_AQUI_SEU_GMAIL_QUE_LOGOU';
+    const isTeacher = authorizedTeachers.includes(currentUser.email.toLowerCase());
+
+    if (isMaster) {
       role = 'master';
       if (document.getElementById('role-badge')) {
         document.getElementById('role-badge').textContent = 'Admin. Principal';
@@ -185,12 +190,22 @@ async function initApp() {
       }
       show(document.getElementById('tab-questions')); // Master can edit bank
       show(document.getElementById('tab-teachers')); // Master can see teachers
-    } else {
+    } else if (isTeacher) {
       role = 'teacher';
       if (document.getElementById('role-badge')) {
         document.getElementById('role-badge').textContent = 'Professor (Acesso Comum)';
         document.getElementById('role-badge').className = 'badge badge-teacher';
       }
+      hide(document.getElementById('tab-questions'));
+      hide(document.getElementById('tab-teachers'));
+    } else {
+      // Usuário logado mas NÃO é mestre nem professor autorizado
+      alert(`Acesso Negado: O e-mail ${currentUser.email} não tem autorização para o painel administrativo. Entre em contato com o Administrador Principal.`);
+      await signOut();
+      currentUser = null;
+      role = 'student';
+      location.hash = '';
+      return;
     }
 
     // Update Topbar
@@ -437,6 +452,8 @@ document.getElementById('go-ranking-btn')?.addEventListener('click', async () =>
         }
         tbody.appendChild(tr);
       });
+    } else {
+      tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 2rem; color: var(--color-danger);">Erro ao carregar o ranking. Verifique o console ou a tabela de estudantes.</td></tr>';
     }
   }
 });
@@ -471,6 +488,15 @@ navBtns.logout?.addEventListener('click', async () => {
 
 async function loadAdminDashboard() {
   if (!currentUser) return;
+  
+  const isMaster = currentUser.email === MASTER_EMAIL || currentUser.email === 'COLOQUE_AQUI_SEU_GMAIL_QUE_LOGOU';
+  const isTeacher = authorizedTeachers.includes(currentUser.email.toLowerCase());
+
+  if (!isMaster && !isTeacher) {
+    alert("Acesso Negado: Sua conta não possui permissão para acessar o dashboard escolar.");
+    location.hash = '';
+    return;
+  }
 
   if (document.getElementById('admin-welcome-title')) {
     document.getElementById('admin-welcome-title').textContent =
@@ -582,6 +608,8 @@ async function refreshAdminTable() {
       `;
       tbody.appendChild(tr);
     });
+  } else {
+    tbody.innerHTML = '<tr><td colspan="6" style="color:var(--color-danger); padding: 2rem;">Erro ao carregar do servidor. Se você acabou de adicionar a desclassificação, verifique se a coluna "disqualified" (boolean) já foi criada no Supabase!</td></tr>';
   }
 }
 
@@ -614,6 +642,128 @@ window.deleteStudentResult = async (id) => {
     }
   }
 };
+
+// -----------------------------------------
+// AUDIT & CLEANUP LOGIC (@antigravity-cleanup)
+// -----------------------------------------
+document.getElementById('toggle-cleanup-btn')?.addEventListener('click', () => {
+  document.getElementById('cleanup-tool-wrapper')?.classList.toggle('hidden');
+});
+
+document.getElementById('run-cleanup-list-btn')?.addEventListener('click', async () => {
+  const rawList = document.getElementById('cleanup-authorized-list').value.trim();
+  if (!rawList) return alert('Por favor, cole a lista de e-mails autorizados antes de prosseguir.');
+
+  const authorizedEmails = rawList.split(/\n|,|;/).map(e => e.trim().toLowerCase()).filter(e => e.includes('@'));
+  if (authorizedEmails.length === 0) return alert('Nenhum e-mail válido detectado na lista informada.');
+
+  const btn = document.getElementById('run-cleanup-list-btn');
+  btn.textContent = 'Buscando alunos na nuvem...';
+  btn.disabled = true;
+
+  try {
+    const allStudents = await fetchRankings();
+    if (!allStudents) throw new Error('Falha ao obter lista de estudantes para auditoria.');
+
+    const studentsToExpel = allStudents.filter(s => {
+      const email = (s.cpf || '').split(' (CPF:')[0].trim().toLowerCase();
+      // Se não está na lista autorizada, será deletado
+      return !authorizedEmails.includes(email);
+    });
+
+    if (studentsToExpel.length === 0) {
+      alert('Tudo certo! Todos os alunos no banco de dados estão na sua lista autorizada.');
+      return;
+    }
+
+    const confirmMsg = `AUDITORIA CONCLUÍDA:\n\nForam encontrados ${studentsToExpel.length} alunos que NÃO estão na sua lista autorizada.\n\nEles serão APAGADOS permanentEMENTE do ranking e das notas.\n\nDeseja expulsar esses ${studentsToExpel.length} alunos agora?`;
+    
+    if (confirm(confirmMsg)) {
+      btn.textContent = `Expulsando ${studentsToExpel.length} alunos...`;
+      let count = 0;
+      for (const s of studentsToExpel) {
+        await supabase.from('students').delete().eq('id', s.id);
+        count++;
+      }
+      alert(`Sucesso! ${count} alunos não autorizados foram expulsos do simulado.`);
+      refreshAdminTable();
+    }
+  } catch (err) {
+    alert('Erro durante a expulsão: ' + err.message);
+  } finally {
+    btn.textContent = 'Expulsar por Lista de Whitelist';
+    btn.disabled = false;
+  }
+});
+
+// Realça e permite deletar alunos não-institucionais
+document.getElementById('cleanup-domain-btn')?.addEventListener('click', async () => {
+  const btn = document.getElementById('cleanup-domain-btn');
+  btn.textContent = 'Analisando domínios...';
+  
+  try {
+    const allStudents = await fetchRankings();
+    if (!allStudents) return;
+
+    const suspects = allStudents.filter(s => {
+      const email = (s.cpf || '').split(' (CPF:')[0].trim().toLowerCase();
+      return !email.endsWith('@escola.pr.gov.br');
+    });
+
+    if (suspects.length === 0) {
+      alert('Parabéns! Todos os alunos cadastrados utilizam o domínio oficial @escola.pr.gov.br');
+      return;
+    }
+
+    if (confirm(`AUDITORIA DE DOMÍNIO:\n\nForam encontrados ${suspects.length} alunos com e-mails fora do padrão (@escola.pr.gov.br).\n\nExemplos: ${suspects.slice(0,3).map(s => s.cpf).join(', ')}...\n\nDeseja EXPULSAR (Apagar) esses ${suspects.length} alunos agora?`)) {
+      btn.textContent = 'Expulsando...';
+      let count = 0;
+      for (const s of suspects) {
+        await supabase.from('students').delete().eq('id', s.id);
+        count++;
+      }
+      alert(`Sucesso! ${count} alunos com e-mail inválido foram removidos.`);
+      refreshAdminTable();
+    }
+  } catch (err) {
+    alert('Erro na limpeza de domínio: ' + err.message);
+  } finally {
+    btn.textContent = '🎯 Identificar e-mails NÃO-institucionais (@escola)';
+  }
+});
+
+document.getElementById('cleanup-duplicate-btn')?.addEventListener('click', async () => {
+  const allStudents = await fetchRankings();
+  if (!allStudents) return;
+
+  const seen = new Map();
+  const duplicates = [];
+  
+  allStudents.forEach(s => {
+    const email = (s.cpf || '').split(' (CPF:')[0].trim().toLowerCase();
+    const key = `${s.name.toLowerCase().trim()}|${email}`;
+    if (seen.has(key)) {
+      duplicates.push(s);
+    } else {
+      seen.set(key, s.id);
+    }
+  });
+
+  if (duplicates.length === 0) {
+    alert('Nenhuma duplicata exata (mesmo nome + mesmo e-mail) encontrada.');
+    return;
+  }
+
+  if (confirm(`AUDITORIA DE DUPLICATAS:\n\nForam encontradas ${duplicates.length} entradas duplicadas (alunos que fizeram a prova mais de uma vez com o mesmo e-mail/nome).\n\nDeseja apagar essas ${duplicates.length} tentativas extras e manter apenas a primeira de cada um?`)) {
+    let count = 0;
+    for (const s of duplicates) {
+      await supabase.from('students').delete().eq('id', s.id);
+      count++;
+    }
+    alert(`Sucesso! ${count} entradas duplicadas foram removidas.`);
+    refreshAdminTable();
+  }
+});
 
 // Master Admin: Add Question
 document.getElementById('admin-save-q-btn')?.addEventListener('click', async () => {

@@ -86,14 +86,33 @@ export async function uploadImage(fileObj) {
   return data.publicUrl;
 }
 export const fetchRankings = async () => {
-  // Primero ordenamos por desclassificado (false < true) e depois por nota descendente
-  const { data, error } = await supabase
-    .from('students')
-    .select('*')
-    .order('disqualified', { ascending: true })
-    .order('score', { ascending: false });
-  if (error) console.error('Error fetching rankings:', error);
-  return data;
+  try {
+    // Tenta primeiro o ranking com a lógica de desclassificação (que exige a coluna no banco)
+    const { data, error } = await supabase
+      .from('students')
+      .select('*')
+      .order('disqualified', { ascending: true })
+      .order('score', { ascending: false });
+    
+    if (error) {
+      console.warn('Erro ao buscar ranking com desclassificação, tentando fallback sem ordenação de desclassificados:', error.message);
+      // Fallback: se a coluna 'disqualified' não existir, tenta buscar apenas por nota
+      const fallback = await supabase
+        .from('students')
+        .select('*')
+        .order('score', { ascending: false });
+      
+      if (fallback.error) {
+        console.error('Erro crítico ao buscar rankings:', fallback.error);
+        return null;
+      }
+      return fallback.data;
+    }
+    return data;
+  } catch (err) {
+    console.error('Falha na comunicação com o Supabase:', err);
+    return null;
+  }
 };
 
 export async function addStudentRecord({ name, grade, score, cpf }) {
