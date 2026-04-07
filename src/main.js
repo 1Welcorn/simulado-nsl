@@ -172,6 +172,9 @@ async function initApp() {
     }
   });
 
+  window.refreshAdminTable = refreshAdminTable;
+  document.getElementById('admin-filter-grade')?.addEventListener('change', refreshAdminTable);
+
   // Check if someone is logged in
   currentUser = await getUser();
 
