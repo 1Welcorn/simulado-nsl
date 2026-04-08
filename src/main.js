@@ -299,13 +299,28 @@ document.getElementById('student-form')?.addEventListener('submit', async (e) =>
     score = 0;
 
     // FILTRA as questões APENAS para o Nível que o estudante selecionou E que estejam ATIVAS na prova
-    questionBank = questionBankAll.filter(q => (q.level === student.grade || !q.level) && Boolean(q.is_active));
+    window.questionBank = window.questionBankAll.filter(q => (q.level === student.grade || !q.level) && Boolean(q.is_active));
 
     // EMBARALHA (Shuffle) as questões para evitar cola (Algoritmo Fisher-Yates)
-    for (let i = questionBank.length - 1; i > 0; i--) {
+    for (let i = window.questionBank.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [questionBank[i], questionBank[j]] = [questionBank[j], questionBank[i]];
+      [window.questionBank[i], window.questionBank[j]] = [window.questionBank[j], window.questionBank[i]];
     }
+
+    // EMBARALHA as ALTERNATIVAS de cada questão individualmente
+    window.questionBank.forEach(q => {
+      // Criamos um mapa das opções com seus índices originais para saber qual é a correta depois
+      const mappedOptions = q.options.map((text, idx) => ({ text, originalIdx: idx }));
+      
+      // Shuffle das opções
+      for (let i = mappedOptions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [mappedOptions[i], mappedOptions[j]] = [mappedOptions[j], mappedOptions[i]];
+      }
+      
+      // Salvamos as opções embaralhadas no objeto da questão (apenas para esta sessão)
+      q.shuffledOptions = mappedOptions;
+    });
 
     // Register in database immediately as starting
     await addStudentRecord({ name, grade, score: 0, cpf: combinedContact });
@@ -313,7 +328,7 @@ document.getElementById('student-form')?.addEventListener('submit', async (e) =>
     const summaryEl = document.getElementById('quiz-student-name');
     if (summaryEl) summaryEl.textContent = name;
 
-    if (questionBank.length === 0) {
+    if (window.questionBank.length === 0) {
       alert(`O banco de dados ainda não tem questões ativas cadastradas para esta categoria. Peça ao administrador para incluir questões!`);
       return;
     }
@@ -390,15 +405,21 @@ function renderQuestion() {
   const optContainer = document.getElementById('q-options');
   if (optContainer) {
     optContainer.innerHTML = '';
-    q.options.forEach((opt, idx) => {
+    
+    // Se tivermos opções embaralhadas, usamos elas, senão usamos as originais (fallback)
+    const optionsToRender = q.shuffledOptions || q.options.map((text, idx) => ({ text, originalIdx: idx }));
+
+    optionsToRender.forEach((optObj, idx) => {
       const label = document.createElement('label');
       label.className = 'option-btn';
       const letter = ['A', 'B', 'C', 'D', 'E'][idx] || '-';
+      
+      // O valor do input agora é o originalIdx, para que a conferência da resposta continue funcionando independente da ordem
       label.innerHTML = `
         <div class="option-letter">${letter}</div>
         <div>
-          <input type="radio" name="q-ans" value="${idx}" class="sr-only" />
-          ${opt}
+          <input type="radio" name="q-ans" value="${optObj.originalIdx}" class="sr-only" />
+          ${optObj.text}
         </div>
       `;
       label.addEventListener('click', () => {
